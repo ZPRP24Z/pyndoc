@@ -1,0 +1,49 @@
+#+title: Timetable
+* Timetable
+** Week I (03.11)
+DEADLINE: <2024-11-03 Sun>
++ Research the pandoc documentation
++ Organize the repository
++ Research the pandoc AST
++ Get familiar with typst and LaTeX syntax and with how pandoc processes it
++ Start work on AST parser
+** Week II (10.11)
+DEADLINE: <2024-11-10 Sun>
++ Storing input format configuration
++ Markdown AST parser prototype
++ Basic CLI interface
++ Provide documentation on currently available functionalities
+** Week III (17.11)
+DEADLINE: <2024-11-17 Sun>
++ Finalize input to AST parser
++ Storing output format configuration
++ AST to output conversion (either LaTeX or typst)
+** Week IV (24.11)
+DEADLINE: <2024-11-24 Sun>
++ Catch up on any delays if they arise in the process
++ Work on output configurations
++ CI Integration
+** Week V (01.12)
+DEADLINE: <2024-12-01 Sun>
++ Enchance CLI interface
++ Finalize Input and Output configurations to include full markdown syntax
+** Week VI (08.12)
+DEADLINE: <2024-12-08 Sun>
++ Summarize all current work and organize documentation
++ Finalize typst and LaTeX output configuration
++ Additional reader/writer (html/org)
+** Week VII (15.12)
+DEADLINE: <2024-12-15 Sun>
++ Review of existing code
++ CLI Improvements
+** Week VIII and IX (01.01)
+DEADLINE: <2025-01-01 Wed>
++ Winter Holidays
+** Week X (05.01)
+DEADLINE: <2025-01-05 Sun>
++ Final revision and testing
++ Final documentation
+** Week XI (12.01)
+DEADLINE: <2025-01-12 Sun>
++ Additional time in case of delay
++ Turn-in of the project
