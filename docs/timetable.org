@@ -1,4 +1,3 @@
-#+title: Timetable
 * Timetable
 ** Week I (03.11)
 DEADLINE: <2024-11-03 Sun>
