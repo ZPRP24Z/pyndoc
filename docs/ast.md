@@ -3,18 +3,18 @@ Pandoc's AST is a representation used as a tool for conversion of markup languag
 
 As the AST is not well documented on Pandoc's side, this document will attempt to break down its notation to make it easier to understand.
 
-## Converting a document to AST Representation
+## 1. Converting a document to AST Representation
 Pandoc provides a way to convert a document to AST representation via
 
 ```sh
 pandoc <file> -t native
 ```
 
-## Structure
+## 2. Structure
 
 The document is broken down and stored in a list-like structure enclosed with square brackets. The structure contains every component of the document separated by commas.
 
-### Headers
+### 2.1 Headers
 
 An example level 1 header will look like this in the AST representation:
 ```
@@ -25,7 +25,7 @@ Where:
 - `"Example-title"` represents the component's title
 - `[Str "Example", Space, Str "Title"]` represents the contents of the header
 
-#### Markdown
+#### 2.1.1 Markdown
 Markdown's headers are very easily translated to AST representation:
 
 * `#` - `Header 1`
@@ -34,7 +34,7 @@ Markdown's headers are very easily translated to AST representation:
 
 ... etc.
 
-#### LaTeX
+#### 2.1.2 LaTeX
 LaTeX's headers are a bit more complicated and differ depending on the type of the highest level header and document's depth.
 
 Consider a document in which only **3** header levels will be used. In that case, the headers will look like this:
@@ -56,3 +56,13 @@ When it comes to markdown to LaTeX conversion, Pandoc handles this in the follow
 * `####` - `\paragraph{}`
 * `#####` - `\subparagraph{}`
 * `######...` - converted into `Para`
+
+### 2.2 Paragraphs
+
+AST uses a `Para` component to represent paragraphs, an example paragraph looks like this:
+```
+Para [Str "Example", Space, Str "paragraph"]
+```
+
+For LaTeX, this should not be confused with `\paragraph{}`, which is **not** converted to `Para`, but to a Level 3 header. (see [2.1.2](#212-latex))
+
