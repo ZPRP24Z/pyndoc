@@ -50,9 +50,9 @@ However, if we want to extend the document to 5 level headers, we can shift the 
 etc
 
 When it comes to markdown to LaTeX conversion, Pandoc handles this in the following way:
-`#` - `\section{}`
-`##` - `\subsection{}`
-`###` - `\subsubsection{}`
-`####` - `\paragraph{}`
-`#####` - `\subparagraph{}`
-`######...` - converted into `Para`
+* `#` - `\section{}`
+* `##` - `\subsection{}`
+* `###` - `\subsubsection{}`
+* `####` - `\paragraph{}`
+* `#####` - `\subparagraph{}`
+* `######...` - converted into `Para`
