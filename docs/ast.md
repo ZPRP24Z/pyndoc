@@ -71,7 +71,7 @@ For LaTeX, this should not be confused with `\paragraph{}`, which is **not** con
 
 In Markdown, a quote is a way to indicate a block of text that represents a quotation or reference. This is typically done using the > character at the beginning of each line of the quote.
 
-AST converts phrase 
+Parser converts phrase 
 ```
 > Hello world!
 ```
@@ -89,7 +89,7 @@ Where:
 ### 2.4 Code Blocks
 In Markdown, code blocks are used to display code snippets or text exactly as written, preserving whitespace and formatting.
 
-AST converts phrase
+Parser converts phrase
 ```
 Hello world!
 ```
@@ -110,7 +110,7 @@ Where:
 
 In Markdown, tables are created using pipes | to separate columns and hyphens - to create headers.
 
-AST converts phrase
+Parser converts phrase
 ```
 | Column 1 | Column 2 | Column 3 |
 |----------|----------|----------|
