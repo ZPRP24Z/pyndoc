@@ -66,3 +66,75 @@ Para [Str "Example", Space, Str "paragraph"]
 
 For LaTeX, this should not be confused with `\paragraph{}`, which is **not** converted to `Para`, but to a Level 3 header. (see [2.1.2](#212-latex))
 
+
+### 2.3 MD Quotes
+
+In Markdown, a quote is a way to indicate a block of text that represents a quotation or reference. This is typically done using the > character at the beginning of each line of the quote.
+
+AST converts phrase 
+```
+> Hello world!
+```
+into 
+```
+[BlockQuote
+ [Para [Str "Hello",Space,Str "world!"]]]
+```
+
+Where:
+- `Block Quote` represents the name of the component
+- `Para` represents single paragraph
+- `[Str "Hello",Space,Str "world!"]` represents the contents of the paragraph
+
+### 2.4 Code Blocks
+In Markdown, code blocks are used to display code snippets or text exactly as written, preserving whitespace and formatting.
+
+AST converts phrase
+```
+Hello world!
+```
+into
+```
+[CodeBlock ("",[],[]) "Hello world!"]
+```
+
+Where: 
+- `Code block` represents the name of the component
+- `("",[],[])` represents metadata about the code block
+    - First element `""`  is for the language class, Here it's empty meaning no specific language is indicated
+    - Second element `[]` is for additional classes that could be applied to the code block
+    - Third element `[]` is for any additional attributes (like custom identifiers or key-value pairs), but it’s also empty here
+- `[Str "Hello",Space,Str "world!"]` represents the contents of the paragraph
+
+### 2.5 MD Tables
+
+In Markdown, tables are created using pipes | to separate columns and hyphens - to create headers.
+
+AST converts phrase
+```
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Row 1    | Data     | More     |
+| Row 2    | Data     | More     |
+```
+into
+```
+[Table [] [AlignDefault,AlignDefault,AlignDefault] [0.0,0.0,0.0]
+ [[Plain [Str "Column",Space,Str "1"]]
+ ,[Plain [Str "Column",Space,Str "2"]]
+ ,[Plain [Str "Column",Space,Str "3"]]]
+ [[[Plain [Str "Row",Space,Str "1"]]
+  ,[Plain [Str "Data"]]
+  ,[Plain [Str "More"]]]
+ ,[[Plain [Str "Row",Space,Str "2"]]
+  ,[Plain [Str "Data"]]
+  ,[Plain [Str "More"]]]]]
+```
+
+Where:
+- `Table` represents the name of the component
+- `[]` represents optional table attributes, such as caption or label, which are not present here
+- `[AlignDefault,AlignDefault,AlignDefault]` specifies the alignment of each column
+- `[0.0,0.0,0.0]` represents relative column widths, where 0.0 means that the widths are unspecified, so they will be automatically adjusted
+- `[[Plain [Str "Column",Space,Str "1"]] ... ]` represents a header cell
+- `[Str "Column",Space,Str "1"]` represents content of the cell
