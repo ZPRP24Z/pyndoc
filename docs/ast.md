@@ -10,6 +10,12 @@ Pandoc provides a way to convert a document to AST representation via
 pandoc <file> -t native
 ```
 
+Or specifically
+```sh
+pandoc <file> -f <file_format> -t native
+```
+e.g. for Github Flavored Markdown: `pandoc <file> -f gfm -t native`
+
 ## 2. Structure
 
 The document is broken down and stored in a list-like structure enclosed with square brackets. The structure contains every component of the document separated by commas.
@@ -57,7 +63,7 @@ When it comes to markdown to LaTeX conversion, Pandoc handles this in the follow
 * `#####` - `\subparagraph{}`
 * `######...` - converted into `Para`
 
-#### 2.1.3 typst
+#### 2.1.3 Typst
 Typst headers/headings have more styling options than markdown ones. For more information suggested reading [typst heading documentation](https://typst.app/docs/reference/model/heading/).
 Typst headings start with one or more `=` symbols followed by a space. The number of `=` determines the heading [depth](https://typst.app/docs/reference/model/heading/#parameters-depth).
 * `=` - Header 1
@@ -158,3 +164,47 @@ Where:
 - `[0.0,0.0,0.0]` represents relative column widths, where 0.0 means that the widths are unspecified, so they will be automatically adjusted
 - `[[Plain [Str "Column",Space,Str "1"]] ... ]` represents a header cell
 - `[Str "Column",Space,Str "1"]` represents content of the cell
+
+### 2.6 Lists
+#### 2.6.1 Bullet List
+In AST Bullet Lists are represented by BulletList objects, which constist [Blocks](https://pandoc.org/lua-filters.html#type-blocks) Example:
+```
+BulletList
+    [ [ Plain [ Str "first" , Space , Str "item" ] ]
+    , [ Plain [ Str "second" , Space , Str "item" ] ]
+    , [ Plain [ Str "third" , Space , Str "item" ] ]
+    , [ Plain [ Str "fourth" , Space , Str "item" ] ]
+    ]
+```
+#### 2.6.1 Markdown(Github Flavored Markdown)
+Markdown bullet list consists of bullet list markers(`-`, `+`, or `*`), and can be nested. Example:
+```
+- item x
+- item y
+	- nested item
+- item z
+```
+About Pandoc conversion to AST:
+It works fine untill the items in a bullet list are nested. When nesting occurs the nested item is not read correctly, instead it is treated as a part of previous list item. Example:
+The list from above is read to Pandoc as:
+```
+[ BulletList
+    [ [ Plain [ Str "item" , Space , Str "x" ] ]
+    , [ Plain
+          [ Str "item"
+          , Space
+          , Str "y"
+          , SoftBreak
+          , Str "-"
+          , Space
+          , Str "nested"
+          , Space
+          , Str "item"
+          ]
+      ]
+    , [ Plain [ Str "item" , Space , Str "z" ] ]
+    ]
+]
+```  
+This reveals a potential improvement area.
+
