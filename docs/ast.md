@@ -167,7 +167,8 @@ Where:
 
 ### 2.6 Lists
 #### 2.6.1 Bullet List
-In AST Bullet Lists are represented by BulletList objects, which constist [Blocks](https://pandoc.org/lua-filters.html#type-blocks) Example:
+In AST Bullet Lists are represented by BulletList objects, which constist of [Blocks](https://pandoc.org/lua-filters.html#type-blocks)
+Example:
 ```
 BulletList
     [ [ Plain [ Str "first" , Space , Str "item" ] ]
@@ -177,7 +178,8 @@ BulletList
     ]
 ```
 #### 2.6.1 Markdown(Github Flavored Markdown)
-Markdown bullet list consists of bullet list markers(`-`, `+`, or `*`), and can be nested. Example:
+Markdown bullet list consists of bullet list markers(`-`, `+`, or `*`), and can be nested.
+Example:
 ```
 - item x
 - item y
