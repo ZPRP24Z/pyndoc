@@ -57,6 +57,26 @@ When it comes to markdown to LaTeX conversion, Pandoc handles this in the follow
 * `#####` - `\subparagraph{}`
 * `######...` - converted into `Para`
 
+#### 2.1.3 typst
+Typst headers/headings have more styling options than markdown ones. For more information suggested reading [typst heading documentation](https://typst.app/docs/reference/model/heading/).
+Typst headings start with one or more `=` symbols followed by a space. The number of `=` determines the heading [depth](https://typst.app/docs/reference/model/heading/#parameters-depth).
+* `=` - Header 1
+* `==` - Header 2
+* `===` - Header 3
+
+etc
+
+When it comes to markdown to typst conversion, Pandoc, apart form transforming `#` into `=`, adds a [typst supplement] (https://typst.app/docs/reference/model/heading/#parameters-supplement) based on the heading text.
+Example:
+```
+## My Header
+```
+transforms into:
+```
+== My Header
+<my-header>
+```
+
 ### 2.2 Paragraphs
 
 AST uses a `Para` component to represent paragraphs, an example paragraph looks like this:
