@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "pyndoc"
+version = "0.1.0"
+description = "CLI for conversion of markup languages"
+authors = [
+    "Łukasz Suchołbiak <sucholbiaklukasz@gmail.com>",
+    "Bartosz Nowak <nowobart@gmail.com>",
+    "Michał Pałasz <michal.palasz12@gmail.com>"
+]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+packages = [{include = "pyndoc", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+tox = "^4.23.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -10,6 +10,12 @@ Pandoc provides a way to convert a document to AST representation via
 pandoc <file> -t native
 ```
 
+Or specifically
+```sh
+pandoc <file> -f <file_format> -t native
+```
+e.g. for Github Flavored Markdown: `pandoc <file> -f gfm -t native`
+
 ## 2. Structure
 
 The document is broken down and stored in a list-like structure enclosed with square brackets. The structure contains every component of the document separated by commas.
@@ -57,6 +63,26 @@ When it comes to markdown to LaTeX conversion, Pandoc handles this in the follow
 * `#####` - `\subparagraph{}`
 * `######...` - converted into `Para`
 
+#### 2.1.3 Typst
+Typst headers/headings have more styling options than markdown ones. For more information suggested reading [typst heading documentation](https://typst.app/docs/reference/model/heading/).
+Typst headings start with one or more `=` symbols followed by a space. The number of `=` determines the heading [depth](https://typst.app/docs/reference/model/heading/#parameters-depth).
+* `=` - Header 1
+* `==` - Header 2
+* `===` - Header 3
+
+etc
+
+When it comes to markdown to typst conversion, Pandoc, apart form transforming `#` into `=`, adds a [typst supplement] (https://typst.app/docs/reference/model/heading/#parameters-supplement) based on the heading text.
+Example:
+```
+## My Header
+```
+transforms into:
+```
+== My Header
+<my-header>
+```
+
 ### 2.2 Paragraphs
 
 AST uses a `Para` component to represent paragraphs, an example paragraph looks like this:
@@ -65,4 +91,122 @@ Para [Str "Example", Space, Str "paragraph"]
 ```
 
 For LaTeX, this should not be confused with `\paragraph{}`, which is **not** converted to `Para`, but to a Level 3 header. (see [2.1.2](#212-latex))
+
+
+### 2.3 MD Quotes
+
+In Markdown, a quote is a way to indicate a block of text that represents a quotation or reference. This is typically done using the > character at the beginning of each line of the quote.
+
+Parser converts phrase 
+```
+> Hello world!
+```
+into 
+```
+[BlockQuote
+ [Para [Str "Hello",Space,Str "world!"]]]
+```
+
+Where:
+- `Block Quote` represents the name of the component
+- `Para` represents single paragraph
+- `[Str "Hello",Space,Str "world!"]` represents the contents of the paragraph
+
+### 2.4 Code Blocks
+In Markdown, code blocks are used to display code snippets or text exactly as written, preserving whitespace and formatting.
+
+Parser converts phrase
+```
+Hello world!
+```
+into
+```
+[CodeBlock ("",[],[]) "Hello world!"]
+```
+
+Where: 
+- `Code block` represents the name of the component
+- `("",[],[])` represents metadata about the code block
+    - First element `""`  is for the language class, Here it's empty meaning no specific language is indicated
+    - Second element `[]` is for additional classes that could be applied to the code block
+    - Third element `[]` is for any additional attributes (like custom identifiers or key-value pairs), but it’s also empty here
+- `[Str "Hello",Space,Str "world!"]` represents the contents of the paragraph
+
+### 2.5 MD Tables
+
+In Markdown, tables are created using pipes | to separate columns and hyphens - to create headers.
+
+Parser converts phrase
+```
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Row 1    | Data     | More     |
+| Row 2    | Data     | More     |
+```
+into
+```
+[Table [] [AlignDefault,AlignDefault,AlignDefault] [0.0,0.0,0.0]
+ [[Plain [Str "Column",Space,Str "1"]]
+ ,[Plain [Str "Column",Space,Str "2"]]
+ ,[Plain [Str "Column",Space,Str "3"]]]
+ [[[Plain [Str "Row",Space,Str "1"]]
+  ,[Plain [Str "Data"]]
+  ,[Plain [Str "More"]]]
+ ,[[Plain [Str "Row",Space,Str "2"]]
+  ,[Plain [Str "Data"]]
+  ,[Plain [Str "More"]]]]]
+```
+
+Where:
+- `Table` represents the name of the component
+- `[]` represents optional table attributes, such as caption or label, which are not present here
+- `[AlignDefault,AlignDefault,AlignDefault]` specifies the alignment of each column
+- `[0.0,0.0,0.0]` represents relative column widths, where 0.0 means that the widths are unspecified, so they will be automatically adjusted
+- `[[Plain [Str "Column",Space,Str "1"]] ... ]` represents a header cell
+- `[Str "Column",Space,Str "1"]` represents content of the cell
+
+### 2.6 Lists
+#### 2.6.1 Bullet List
+In AST Bullet Lists are represented by BulletList objects, which constist of [Blocks](https://pandoc.org/lua-filters.html#type-blocks)
+Example:
+```
+BulletList
+    [ [ Plain [ Str "first" , Space , Str "item" ] ]
+    , [ Plain [ Str "second" , Space , Str "item" ] ]
+    , [ Plain [ Str "third" , Space , Str "item" ] ]
+    , [ Plain [ Str "fourth" , Space , Str "item" ] ]
+    ]
+```
+#### 2.6.1 Markdown(Github Flavored Markdown)
+Markdown bullet list consists of bullet list markers(`-`, `+`, or `*`), and can be nested.
+Example:
+```
+- item x
+- item y
+	- nested item
+- item z
+```
+About Pandoc conversion to AST:
+It works fine untill the items in a bullet list are nested. When nesting occurs the nested item is not read correctly, instead it is treated as a part of previous list item. Example:
+The list from above is read to Pandoc as:
+```
+[ BulletList
+    [ [ Plain [ Str "item" , Space , Str "x" ] ]
+    , [ Plain
+          [ Str "item"
+          , Space
+          , Str "y"
+          , SoftBreak
+          , Str "-"
+          , Space
+          , Str "nested"
+          , Space
+          , Str "item"
+          ]
+      ]
+    , [ Plain [ Str "item" , Space , Str "z" ] ]
+    ]
+]
+```  
+This reveals a potential improvement area.
 
