@@ -1,6 +1,8 @@
 import pytest
 from pyndoc.ast.blocks import AstBlock, Str
-import pyndoc.ast.gfm.blocks as gfm
+import pyndoc.ast.blocks as ast
+from pyndoc.ast.gfm.declare import declare_gfm
+import re
 
 
 def test_empty_ast_block():
@@ -38,7 +40,40 @@ def test_str_change():
     assert b.contents == ["abcd"]
 
 # -------------- GFM BLOCKS -------------------
+GFM_DICT = declare_gfm()
 
-def test_gfm_header():
-    b = gfm.Header(1, "This is a header!")
-    assert b.contents[1][0].contents == "This is a header!"
+@pytest.mark.parametrize(
+    ("pattern", "text"),
+    [
+        (GFM_DICT[ast.Header][0], "# H"),
+        (GFM_DICT[ast.Header][0], "## H"),
+        (GFM_DICT[ast.Header][0], "#### H"),
+        (GFM_DICT[ast.Header][0], "###### H"),
+    ]    
+)
+def test_header_regex(pattern, text):
+    assert re.search(pattern, text)
+
+@pytest.mark.parametrize(
+    ("pattern", "text"),
+    [
+        (GFM_DICT[ast.Italic][0], "*italic*"),
+        (GFM_DICT[ast.Italic][0], "test *italic* test"),
+        (GFM_DICT[ast.Bold][0], "**bold**"),
+        (GFM_DICT[ast.Bold][0], "test **bold** test")
+    ]
+)
+def test_italic_bold_regex(pattern, text):
+    assert re.search(pattern, text)
+
+@pytest.mark.parametrize(
+    ("pattern", "text"),
+    [
+        (GFM_DICT[ast.Italic][0], "***italic***"),
+        (GFM_DICT[ast.Italic][0], "test ***italic*** test"),
+        (GFM_DICT[ast.Bold][0], "***bold***"),
+        (GFM_DICT[ast.Bold][0], "test ***bold*** test")
+    ]
+)
+def test_italic_and_bold_regex(pattern, text):
+    assert re.search(pattern, text)
