@@ -4,15 +4,19 @@ import pytest
 from pyndoc.ast.gfm.declare import declare_gfm
 
 GFM_DICT = declare_gfm()
-
+header_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Header][0]
+print(header_pattern)
+emph_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Emph][0]
+strong_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Strong][0]
+code_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Code][0]
 
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
-        (GFM_DICT[ast.Header][0], "# H"),
-        (GFM_DICT[ast.Header][0], "## H"),
-        (GFM_DICT[ast.Header][0], "#### H"),
-        (GFM_DICT[ast.Header][0], "###### H"),
+        (header_pattern, "# H"),
+        (header_pattern, "## H"),
+        (header_pattern, "#### H"),
+        (header_pattern, "###### H"),
     ],
 )
 def test_header_regex(pattern, text):
@@ -22,10 +26,10 @@ def test_header_regex(pattern, text):
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
-        (GFM_DICT[ast.Emph][0], "*italic*"),
-        (GFM_DICT[ast.Emph][0], "test *italic* test"),
-        (GFM_DICT[ast.Strong][0], "**bold**"),
-        (GFM_DICT[ast.Strong][0], "test **bold** test"),
+        (emph_pattern, "*italic*"),
+        (emph_pattern, "test *italic* test"),
+        (strong_pattern, "**bold**"),
+        (strong_pattern, "test **bold** test"),
     ],
 )
 def test_italic_bold_regex(pattern, text):
@@ -35,10 +39,10 @@ def test_italic_bold_regex(pattern, text):
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
-        (GFM_DICT[ast.Emph][0], "***italic***"),
-        (GFM_DICT[ast.Emph][0], "test ***italic*** test"),
-        (GFM_DICT[ast.Strong][0], "***bold***"),
-        (GFM_DICT[ast.Strong][0], "test ***bold*** test"),
+        (emph_pattern, "***italic***"),
+        (emph_pattern, "test ***italic*** test"),
+        (strong_pattern, "***bold***"),
+        (strong_pattern, "test ***bold*** test"),
     ],
 )
 def test_italic_and_bold_regex(pattern, text):
@@ -48,10 +52,10 @@ def test_italic_and_bold_regex(pattern, text):
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
-        (GFM_DICT[ast.Emph][0], "*italic* *italic*"),
-        (GFM_DICT[ast.Emph][0], "*italic* **bold**"),
-        (GFM_DICT[ast.Strong][0], "**bold** **bold**"),
-        (GFM_DICT[ast.Strong][0], "**bold** *italic*"),
+        (emph_pattern, "*italic* *italic*"),
+        (emph_pattern, "*italic* **bold**"),
+        (strong_pattern, "**bold** **bold**"),
+        (strong_pattern, "**bold** *italic*"),
     ],
 )
 def test_multiple_patterns_in_line(pattern, text):
@@ -61,10 +65,10 @@ def test_multiple_patterns_in_line(pattern, text):
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
-        (GFM_DICT[ast.Code][0], "`code` `code`"),
-        (GFM_DICT[ast.Code][0], "``code`` `code`"),
-        (GFM_DICT[ast.Code][0], "`code` ``code``"),
-        (GFM_DICT[ast.Code][0], "`code`"),
+        (code_pattern, "`code` `code`"),
+        (code_pattern, "``code`` `code`"),
+        (code_pattern, "`code` ``code``"),
+        (code_pattern, "`code`"),
     ],
 )
 def test_inline_code(pattern, text):
@@ -74,11 +78,11 @@ def test_inline_code(pattern, text):
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
-        (GFM_DICT[ast.Code][0], "`not \n code`"),
-        (GFM_DICT[ast.Emph][0], "*not \n italic*"),
-        (GFM_DICT[ast.Strong][0], "`**not \n bold**"),
+        (code_pattern, "`not \n code`"),
+        (emph_pattern, "*not \n italic*"),
+        (strong_pattern, "`**not \n bold**"),
         (
-            GFM_DICT[ast.Code][0],
+            code_pattern,
             """
         `this is
          not code`
@@ -88,16 +92,16 @@ def test_inline_code(pattern, text):
 )
 def test_newline_inline_patterns(pattern, text):
     assert not re.search(pattern, text)
-
+r"(^|[^`])(`{1,2})(?P<contents>[^\n]+?)\2(?!`)"
 
 @pytest.mark.parametrize(
     ("pattern", "text", "contents"),
     [
-        (GFM_DICT[ast.Header][0], "# Header", "Header"),
-        (GFM_DICT[ast.Emph][0], "*italic*", "italic"),
-        (GFM_DICT[ast.Strong][0], "**bold**", "bold"),
-        (GFM_DICT[ast.Code][0], "`code`", "code"),
-        (GFM_DICT[ast.Strong][0], "***bolditalic***", "*bolditalic*"),
+        (header_pattern, "# Header", "Header"),
+        (emph_pattern, "*italic*", "italic"),
+        (strong_pattern, "**bold**", "bold"),
+        (code_pattern, "`code`", "code"),
+        (strong_pattern, "***bolditalic***", "*bolditalic*"),
     ],
 )
 def test_groups(pattern, text, contents):
