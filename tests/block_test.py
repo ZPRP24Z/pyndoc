@@ -1,8 +1,5 @@
 import pytest
-from pyndoc.ast.blocks import AstBlock, Str
-import pyndoc.ast.blocks as ast
-from pyndoc.ast.gfm.declare import declare_gfm
-import re
+from pyndoc.ast.blocks import ASTBlock, Str
 
 
 def test_empty_ast_block():
@@ -11,14 +8,14 @@ def test_empty_ast_block():
     TypeError should be raised if one is not provided
     """
     with pytest.raises(TypeError):
-        AstBlock()
+        ASTBlock()
 
 
 def test_custom_ast_block():
     """
     Testing an AST Block with just another name
     """
-    b = AstBlock(name="NewBlock")
+    b = ASTBlock(name="NewBlock")
     assert b.name == "NewBlock"
 
 
@@ -27,7 +24,7 @@ def test_str_block():
     Testing a generic Str block
     """
     b = Str("This is a string")
-    assert b.contents == "This is a string"
+    assert b.content == "This is a string"
 
 
 def test_str_change():
@@ -35,8 +32,9 @@ def test_str_change():
     Testing changing Str contents
     """
     b = Str()
-    assert not b.contents
-    b.contents = ["abcd"]
-    assert b.contents == ["abcd"]
+    assert not b.content
+    b.content = ["abcd"]
+    assert b.content == ["abcd"]
+
 
 # -------------- GFM BLOCKS -------------------
