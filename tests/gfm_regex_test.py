@@ -1,10 +1,11 @@
 import pyndoc.ast.blocks as ast
+import pyndoc.ast.gfm.blocks as gfm
 import re
 import pytest
-from pyndoc.ast.gfm.declare import declare_gfm
+from pyndoc.ast.gfm.declare import declare
 
-GFM_DICT = declare_gfm()
-header_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Header][0]
+GFM_DICT = declare()
+header_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == gfm.Header][0]
 print(header_pattern)
 emph_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Emph][0]
 strong_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Strong][0]
