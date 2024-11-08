@@ -12,6 +12,7 @@ class Reader:
             contents = fp.read()
         return contents
 
+    # TODO: ADD SPAN CHECKS HERE, SO BLOCKS DONT GET CHECKED TWICE!
     def parse(self, contents: str):
         """
         parse a document, turn all reader objects to functions
