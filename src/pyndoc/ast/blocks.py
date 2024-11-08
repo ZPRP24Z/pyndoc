@@ -27,7 +27,7 @@ class ASTCompositeBlock(ASTBlock):
         super().__init__(name)
 
     def parse(self, match: re.Match):
-        return match.group("content")
+        return match.group("contents")
 
 
 class Space(ASTAtomBlock):

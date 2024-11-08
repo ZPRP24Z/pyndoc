@@ -10,13 +10,26 @@ def test_reader_init():
 def test_reader_header():
     reader = Reader("gfm")
     reader.parse("# test")
-    print(reader._blocks)
     assert len(reader._blocks) == 1
     assert reader._blocks[0][0].contents.metadata == [1]
 
 def test_reader_header_higherlevel():
     reader = Reader("gfm")
     reader.parse("### test")
-    print(reader._blocks)
     assert len(reader._blocks) == 1
     assert reader._blocks[0][0].contents.metadata == [3]
+
+def test_italic():
+    reader = Reader("gfm")
+    reader.parse("*italic text*")
+    assert len(reader._blocks) == 1
+
+def test_multiple_items_bolditalic():
+    reader = Reader("gfm")
+    reader.parse("## Header **bold that holds *italic***")
+    assert len(reader._blocks) == 3
+
+def test_multiple_items_itabold():
+    reader = Reader("gfm")
+    reader.parse("## Header *italic that holds **bold***")
+    assert len(reader._blocks) == 3
