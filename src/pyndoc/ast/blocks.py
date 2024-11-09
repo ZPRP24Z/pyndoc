@@ -22,13 +22,28 @@ class ASTCompositeContents():
 
 
 class ASTCompositeBlock(ASTBlock):
+    start_pattern = ''
+    end_pattern = ''
+
     def __init__(self, name: str, metadata: list = [], contents: list[ASTBlock] = []):
         self.contents = ASTCompositeContents(metadata, contents)
         super().__init__(name)
 
-    def parse(self, match: re.Match):
-        return match.group("contents")
+    @classmethod
+    def start(cls, text: str) -> re.Match | None:
+        return re.match(cls.start_pattern, text)
 
+    @classmethod
+    def end(cls, text: str) -> re.Match | None:
+        return re.match(cls.end_pattern, text)
+
+    @classmethod
+    def override_start(cls, pattern: str) -> None:
+        cls.start_pattern = pattern
+
+    @classmethod
+    def override_end(cls, pattern: str):
+        cls.end_pattern = pattern
 
 class Space(ASTAtomBlock):
     """
