@@ -17,6 +17,14 @@ class ASTAtomBlock(ASTBlock):
             return self.name == other.name and self.content == other.content
         return NotImplemented
 
+    @classmethod
+    def end(cls, text: str) -> re.Match | None:
+        return re.match(cls.end_pattern, text)
+
+    @classmethod
+    def override_end(cls, pattern: str) -> None:
+        cls.end_pattern = pattern
+
 
 @dataclass
 class ASTCompositeContents:
@@ -31,6 +39,9 @@ class ASTCompositeBlock(ASTBlock):
     def __init__(self, name: str, metadata: list = [], contents: list[ASTBlock] = []):
         self.contents = ASTCompositeContents(metadata, contents)
         super().__init__(name)
+
+    def insert(self, block: ASTBlock) -> None:
+        self.contents.contents.append(block)
 
     @classmethod
     def start(cls, text: str) -> re.Match | None:
