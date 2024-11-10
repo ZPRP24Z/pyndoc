@@ -11,6 +11,7 @@ emph_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Emph][0]
 strong_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Strong][0]
 code_pattern = [key for key in GFM_DICT.keys() if GFM_DICT[key] == ast.Code][0]
 
+
 @pytest.mark.parametrize(
     ("pattern", "text"),
     [
@@ -93,7 +94,10 @@ def test_inline_code(pattern, text):
 )
 def test_newline_inline_patterns(pattern, text):
     assert not re.search(pattern, text)
+
+
 r"(^|[^`])(`{1,2})(?P<contents>[^\n]+?)\2(?!`)"
+
 
 @pytest.mark.parametrize(
     ("pattern", "text", "contents"),

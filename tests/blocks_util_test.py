@@ -7,7 +7,18 @@ from pyndoc.ast.blocks import Space, Str, decompose_text
     [
         (" after_space", [Str("after_space")]),
         ("trailing_space_cut ", [Str("trailing_space_cut")]),
-        ("just a normal text", [Str("just"), Space(), Str("a"), Space(), Str("normal"), Space(), Str("text")]),
+        (
+            "just a normal text",
+            [
+                Str("just"),
+                Space(),
+                Str("a"),
+                Space(),
+                Str("normal"),
+                Space(),
+                Str("text"),
+            ],
+        ),
         ("double_space  between", [Str("double_space"), Space(), Str("between")]),
     ],
 )

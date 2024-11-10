@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 import re
 
+
 class ASTBlock:
     def __init__(self, name: str):
         self.name = name
+
 
 class ASTAtomBlock(ASTBlock):
     def __init__(self, name: str, contents: str):
@@ -15,15 +17,16 @@ class ASTAtomBlock(ASTBlock):
             return self.name == other.name and self.content == other.content
         return NotImplemented
 
+
 @dataclass
-class ASTCompositeContents():
+class ASTCompositeContents:
     metadata: list
     contents: list[ASTBlock]
 
 
 class ASTCompositeBlock(ASTBlock):
-    start_pattern = ''
-    end_pattern = ''
+    start_pattern = ""
+    end_pattern = ""
 
     def __init__(self, name: str, metadata: list = [], contents: list[ASTBlock] = []):
         self.contents = ASTCompositeContents(metadata, contents)
@@ -45,6 +48,7 @@ class ASTCompositeBlock(ASTBlock):
     def override_end(cls, pattern: str):
         cls.end_pattern = pattern
 
+
 class Space(ASTAtomBlock):
     """
     AST Atom block representing whitespace
@@ -59,7 +63,7 @@ class Str(ASTAtomBlock):
     special AST block representing string without whitespace characters
     """
 
-    def __init__(self, contents: str = ''):
+    def __init__(self, contents: str = ""):
         super().__init__("Str", contents)
 
 
@@ -68,7 +72,7 @@ class Header(ASTCompositeBlock):
     AST block representing a heading
     """
 
-    def __init__(self, level: int=1):
+    def __init__(self, level: int = 1):
         super().__init__("Header", [level])
 
 

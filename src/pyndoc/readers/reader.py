@@ -2,11 +2,12 @@ import importlib
 import re
 import pyndoc.ast.blocks as ast
 
-class Reader():
+
+class Reader:
     def __init__(self, lang: str):
         self._tree = []
         self._context = []
-        self._token = ''
+        self._token = ""
 
         lang_module = importlib.import_module(f"pyndoc.ast.{lang}.tokens")
         self._block_types = lang_module.starts().keys()
@@ -30,7 +31,7 @@ class Reader():
                 return
 
             # process token before the block-end
-            self._token = self._token[:end_match.start()]
+            self._token = self._token[: end_match.start()]
             self._process_atom_block()
 
             # block is processed, move it to finished tree
@@ -45,11 +46,10 @@ class Reader():
             start_match = block.start(self._token)
             if not start_match:
                 continue
-            self._token = self._token[:start_match.start()]
+            self._token = self._token[: start_match.start()]
             self._process_atom_block()
 
             self._context = block(start_match)
-
 
     def process(self, char: str):
         """
@@ -59,7 +59,6 @@ class Reader():
         """
         self._token += char
         self._check_end()
-
 
     def read(self, filename: str):
         """

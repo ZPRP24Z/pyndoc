@@ -11,26 +11,26 @@ def starts():
         gfm.Header: r"^(?P<h>#{1,6}) ",
         ast.Strong: r"\*\*",
         ast.Emph: r"\*",
-        ast.Code: r"`"
+        ast.Code: r"`",
     }
     return declared_tokens
+
 
 def ends():
     declared_ends = {
         ast.Strong: r"\*\*",
         ast.Emph: r"\*",
-        ast.ASTCompositeBlock: r"\n"  # DEFAULT
+        ast.ASTCompositeBlock: r"\n",  # DEFAULT
     }
     return declared_ends
+
 
 def assign_patterns():
     start_dict = starts()
     end_dict = ends()
-
 
     for block in end_dict.keys():
         block.override_end(end_dict[block])
 
     for block in start_dict.keys():
         block.override_start(start_dict[block])
-
