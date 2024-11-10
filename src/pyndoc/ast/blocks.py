@@ -8,6 +8,8 @@ class ASTBlock:
 
 
 class ASTAtomBlock(ASTBlock):
+    pattern = ""
+
     def __init__(self, name: str, contents: str):
         self.content = contents
         super().__init__(name)
@@ -17,13 +19,16 @@ class ASTAtomBlock(ASTBlock):
             return self.name == other.name and self.content == other.content
         return NotImplemented
 
-    @classmethod
-    def end(cls, text: str) -> re.Match | None:
-        return re.match(cls.end_pattern, text)
+    def __repr__(self):
+        return f'{self.name}("{self.content}")'
 
     @classmethod
-    def override_end(cls, pattern: str) -> None:
-        cls.end_pattern = pattern
+    def match_pattern(cls, text: str) -> re.Match | None:
+        return re.search(cls.pattern, text)
+
+    @classmethod
+    def override_match_pattern(cls, pattern: str) -> None:
+        cls.pattern = pattern
 
 
 @dataclass
@@ -45,11 +50,11 @@ class ASTCompositeBlock(ASTBlock):
 
     @classmethod
     def start(cls, text: str) -> re.Match | None:
-        return re.match(cls.start_pattern, text)
+        return re.search(cls.start_pattern, text)
 
     @classmethod
     def end(cls, text: str) -> re.Match | None:
-        return re.match(cls.end_pattern, text)
+        return re.search(cls.end_pattern, text)
 
     @classmethod
     def override_start(cls, pattern: str) -> None:
@@ -65,7 +70,7 @@ class Space(ASTAtomBlock):
     AST Atom block representing whitespace
     """
 
-    def __init__(self):
+    def __init__(self, _=""):
         super().__init__("Space", " ")
 
 
