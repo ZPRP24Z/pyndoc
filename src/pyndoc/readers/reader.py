@@ -8,10 +8,10 @@ class Reader():
         self._context = []
         self._token = ''
 
-        lang_module = importlib.import_module(f"pyndoc.ast.{lang}")
-        self._block_types = lang_module.tokens.starts.keys()
+        lang_module = importlib.import_module(f"pyndoc.ast.{lang}.tokens")
+        self._block_types = lang_module.starts().keys()
 
-        lang_module.tokens.assign_patterns()
+        lang_module.assign_patterns()
 
     # TODO: FINISH THIS!
     def _process_atom_block(self):
