@@ -13,27 +13,34 @@ class Reader():
 
         lang_module.assign_patterns()
 
-    # TODO: FINISH THIS!
     def _process_atom_block(self):
         """
-        process an atom block (Str, Space etc.)
+        Process an atom block (Str, Space, etc.)
         """
-        pass
+        blocks = ast.decompose_text(self._token)
+
+        if self._context:
+            self._context[-1].contents.contents.extend(blocks)
+        else:
+            self._tree.extend(blocks)
+
+        self._token = ''
 
     def _check_end(self):
         """
-        check if the current context block has ended
+        Check if the current context block has ended
         """
+        if not self._context:
+            return
+
         if self._context[-1]:
             end_match = self._context[-1].end(self._token)
             if not end_match:
                 return
 
-            # process token before the block-end
             self._token = self._token[:end_match.start()]
             self._process_atom_block()
 
-            # block is processed, move it to finished tree
             self._tree.append(self._context.pop())
 
     def _check_start(self):
@@ -43,32 +50,17 @@ class Reader():
         """
         for block in self._block_types:
             start_match = block.start(self._token)
-            if not start_match:
-                continue
-            self._token = self._token[:start_match.start()]
-            self._process_atom_block()
-
-            self._context = block(start_match)
-
 
     def process(self, char: str):
         """
-        Process a current token
-        taking into consideration the current context tree, check if
-        a new block has started or ended, process atom blocks
+        Process a single character
         """
         self._token += char
         self._check_end()
 
-
-    def read(self, filename: str):
-        """
-        Open and read a file one character at a time,
-        then pass the character to tokenizer
-        """
-        with open(filename, 'r') as fp:
-            while True:
-                char = fp.read(1)
-                if not char:
-                    break
-                self.process(char)
+    def read(self, filename: str) -> str:
+        with open(filename, "r") as fp:
+            contents = fp.read()
+        for char in contents:
+            self.process(char)
+        return contents
