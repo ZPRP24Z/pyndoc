@@ -8,7 +8,7 @@ class Header(ast.Header):
         super().__init__(len(match.group("h")))
 
 class Emph(ast.Emph):
-    def __init__(self):
+    def __init__(self, _=None):
         super().__init__()
 
     @classmethod

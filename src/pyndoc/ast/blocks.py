@@ -44,17 +44,19 @@ class ASTAtomBlock(ASTBlock):
 
 
 
-@dataclass
 class ASTCompositeContents:
-    metadata: list
-    contents: list[ASTBlock]
+    def __init__(self, metadata: list, contents: list[ASTBlock]):
+        self.metadata = metadata
+        self.contents = contents
 
 
 class ASTCompositeBlock(ASTBlock):
     start_pattern = ""
     end_pattern = ""
 
-    def __init__(self, name: str, metadata: list = [], contents: list[ASTBlock] = []):
+    def __init__(self, name: str, metadata = None, contents = None):
+        metadata = metadata if metadata else []
+        contents = contents if contents else []
         self.contents = ASTCompositeContents(metadata, contents)
         super().__init__(name)
 
