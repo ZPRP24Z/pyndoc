@@ -65,7 +65,7 @@ class Reader:
             if not start_match:
                 continue
             self._token = self._token[: start_match.start()]
-            self._check_atom_block()
+            self._process_atom_block()
 
             self._context.append(block(start_match))
 
@@ -77,8 +77,8 @@ class Reader:
         """
         self._token += char
         self._check_end()
-        self._check_atom_block()
         self._check_start()
+        self._check_atom_block()
 
     def read(self, filename: str):
         """
