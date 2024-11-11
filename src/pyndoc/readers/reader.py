@@ -29,8 +29,8 @@ class Reader:
         if not self._context:
             return
 
-        atom_blocks = ast.decompose_text(self._token)
-        self._token = ""
+        atom_blocks = ast.decompose_text(self._token[:-1])
+        self._token = self._token[-1:]
 
         for atom_block in atom_blocks:
             self._context[-1].insert(atom_block)
