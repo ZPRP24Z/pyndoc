@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 import re
 
 
@@ -9,8 +10,9 @@ class ASTBlock:
 
 class ASTAtomBlock(ASTBlock):
     pattern = ""
+    has_content = False
 
-    def __init__(self, name: str, contents: str):
+    def __init__(self, name: str, contents: str=""):
         self.content = contents
         super().__init__(name)
 
@@ -29,6 +31,17 @@ class ASTAtomBlock(ASTBlock):
     @classmethod
     def override_match_pattern(cls, pattern: str) -> None:
         cls.pattern = pattern
+
+    @classmethod
+    def block_has_content(cls) -> Any:
+        return cls.has_content
+
+    @classmethod
+    def override_has_content(cls, value: Any) -> None:
+        cls.has_content = value
+
+
+
 
 
 @dataclass
@@ -72,8 +85,8 @@ class Space(ASTAtomBlock):
     AST Atom block representing whitespace
     """
 
-    def __init__(self, _=""):
-        super().__init__("Space", " ")
+    def __init__(self):
+        super().__init__("Space")
 
 
 class Str(ASTAtomBlock):

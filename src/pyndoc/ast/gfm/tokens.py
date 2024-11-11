@@ -27,8 +27,8 @@ def ends():
 
 def atomic_patterns():
     declared_atomic_patterns = {
-        ast.Str: r"^[^\s\n]+$",
-        ast.Space: r"^[ ]+$",
+        ast.Str: (r"^[^\s\n]+$", True),
+        ast.Space: (r"^[ ]+$", False)
     }
     return declared_atomic_patterns
 
@@ -45,4 +45,7 @@ def assign_patterns():
         block.override_start(start_dict[block])
 
     for block in atomic_patterns_dict.keys():
-        block.override_match_pattern(atomic_patterns_dict[block])
+        block.override_match_pattern(atomic_patterns_dict[block][0])
+
+    for block in atomic_patterns_dict.keys():
+        block.override_has_content(atomic_patterns_dict[block][1])

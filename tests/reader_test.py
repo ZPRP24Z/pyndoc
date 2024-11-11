@@ -22,6 +22,7 @@ def test_simple_header_with_space(mocker, gfm_reader):
 
     assert gfm_reader._tree[0]
     inside_blocks = gfm_reader._tree[0].contents.contents
+    print(inside_blocks)
 
     assert inside_blocks[0] == ast.Str("simple")
     assert inside_blocks[1] == ast.Space()

@@ -29,11 +29,16 @@ class Reader:
         if not self._context:
             return
 
-        atom_blocks = ast.decompose_text(self._token[:-1])
+        atom_block = [atom_block for atom_block in self._atom_block_types if atom_block.match_pattern(self._token[:-1])]
+        if not atom_block:
+            return
+        if atom_block[0].block_has_content():
+            self._context[-1].insert(atom_block[0](self._token[:-1]))
+        else:
+            self._context[-1].insert(atom_block[0]())
+
         self._token = self._token[-1:]
 
-        for atom_block in atom_blocks:
-            self._context[-1].insert(atom_block)
 
     def _check_end(self):
         """
