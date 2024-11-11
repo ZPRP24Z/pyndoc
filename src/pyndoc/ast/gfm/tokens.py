@@ -10,7 +10,7 @@ def starts():
     declared_tokens = {
         gfm.Header: r"^(?P<h>#{1,6}) ",
         ast.Strong: r"\*\*",
-        ast.Emph: r"\*",
+        gfm.Emph: r"\*[^*]{1}",
         ast.Code: r"`",
     }
     return declared_tokens
@@ -19,7 +19,7 @@ def starts():
 def ends():
     declared_ends = {
         ast.Strong: r"\*\*",
-        ast.Emph: r"\*",
+        gfm.Emph: r"\*",
         ast.ASTCompositeBlock: r"(\n)$",  # DEFAULT
     }
     return declared_ends

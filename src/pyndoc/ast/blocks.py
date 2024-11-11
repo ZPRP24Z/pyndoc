@@ -49,12 +49,14 @@ class ASTCompositeBlock(ASTBlock):
         self.contents.contents.append(block)
 
     @classmethod
-    def start(cls, text: str) -> re.Match | None:
-        return re.search(cls.start_pattern, text)
+    def start(cls, token: str) -> tuple[re.Match | None, str]:
+        match = re.search(cls.start_pattern, token)
+        token = token[:match.start()] if match else token
+        return (match, token)
 
     @classmethod
-    def end(cls, text: str) -> re.Match | None:
-        return re.search(cls.end_pattern, text)
+    def end(cls, token: str) -> re.Match | None:
+        return re.search(cls.end_pattern, token)
 
     @classmethod
     def override_start(cls, pattern: str) -> None:

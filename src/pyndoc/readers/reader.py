@@ -61,10 +61,10 @@ class Reader:
         If so, set the current context as the block
         """
         for block in self._block_types:
-            start_match = block.start(self._token)
+            start_match, new_token = block.start(self._token)
             if not start_match:
                 continue
-            self._token = self._token[: start_match.start()]
+            self._token = new_token
             self._process_atom_block()
 
             self._context.append(block(start_match))
