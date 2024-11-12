@@ -7,6 +7,7 @@ class Header(ast.Header):
     def __init__(self, match: re.Match):
         super().__init__(len(match.group("h")))
 
+
 class Emph(ast.Emph):
     def __init__(self, _=None):
         super().__init__()

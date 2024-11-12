@@ -28,7 +28,7 @@ def ends():
 def atomic_patterns():
     declared_atomic_patterns = {
         ast.Str: (r"^[^\s\n]+$", True),
-        ast.Space: (r"^[ ]+$", False)
+        ast.Space: (r"^[ ]+$", False),
     }
     return declared_atomic_patterns
 
