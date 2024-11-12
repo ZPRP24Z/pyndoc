@@ -2,6 +2,15 @@ import importlib
 
 
 class Reader:
+    """
+    Class representing a general reader for all input languages
+    Fields:
+        * tree - representing the tree into which the blocks will be processed
+        * context - stack-like representation of currently processed blocks
+        * token - currently processed token
+        * block_types - types of composite blocks found in a given language
+        * atom_block_types - atom blocks found in a give language
+    """
     def __init__(self, lang: str):
         self._tree = []
         self._context = []
@@ -52,14 +61,14 @@ class Reader:
             end_match = self._context[-1].end(self._token)
             if not end_match:
                 return
-            print(
-                f"FOUND END: \n\ttoken: {self._token}\n\tcontext: {self._context[-1]}\n\t"
-            )
 
             # process token before the block-end
             self._process_atom_block(self._token[: end_match.start()])
             self._token = ""
 
+            self._end()
+
+    def _end(self):
             # block is processed, move it to finished tree
             if len(self._context) > 1:
                 item = self._context.pop()
@@ -85,6 +94,11 @@ class Reader:
             self._context.append(block(start_match))
             print(f"ADDED, CURRENT CONTEXT: {self._context}")
 
+    def _close_context(self) -> None:
+        while(self._context):
+            self._process_atom_block(self._token)
+            self._end()
+
     def process(self, char: str):
         """
         Process a current token
@@ -105,6 +119,7 @@ class Reader:
             while True:
                 char = fp.read(1)
                 if not char:
+                    self._close_context()
                     break
 
                 self.process(char)

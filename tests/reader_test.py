@@ -97,3 +97,24 @@ def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker
     gfm_reader.read("Foo")
     composite_block_contents = gfm_reader._tree[0].contents.contents
     assert composite_block_contents == atom_block_list
+
+
+@pytest.mark.parametrize(
+    ("data", "blocks"),
+    [
+        (
+            "# Header without newline",
+            [
+                Str("Header"),
+                Space(),
+                Str("without"),
+                Space(),
+                Str("newline")
+            ]
+        ),
+    ],
+)
+@mock_file
+def test_eof_header(gfm_reader, mocker, data, blocks):
+    gfm_reader.read("Foo")
+    assert gfm_reader._tree[0].contents.contents == blocks
