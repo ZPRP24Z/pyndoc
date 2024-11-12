@@ -1,6 +1,4 @@
 import importlib
-import re
-import pyndoc.ast.blocks as ast
 
 
 class Reader:
@@ -35,13 +33,16 @@ class Reader:
         if not self._context:
             return
 
-        atom_block = [atom_block for atom_block in self._atom_block_types if atom_block.match_pattern(token)]
+        atom_block = [
+            atom_block
+            for atom_block in self._atom_block_types
+            if atom_block.match_pattern(token)
+        ]
         if not atom_block:
             return
         args = tuple([token]) if atom_block[0].block_has_content() else ()
         print(f"PROCESSED, ADDING {atom_block[0]} to {self._context[-1]}")
         self._context[-1].insert(atom_block[0](*args))
-
 
     def _check_end(self):
         """
@@ -51,10 +52,12 @@ class Reader:
             end_match = self._context[-1].end(self._token)
             if not end_match:
                 return
-            print(f"FOUND END: \n\ttoken: {self._token}\n\tcontext: {self._context[-1]}\n\t")
+            print(
+                f"FOUND END: \n\ttoken: {self._token}\n\tcontext: {self._context[-1]}\n\t"
+            )
 
             # process token before the block-end
-            self._process_atom_block(self._token[:end_match.start()])
+            self._process_atom_block(self._token[: end_match.start()])
             self._token = ""
 
             # block is processed, move it to finished tree
@@ -73,8 +76,10 @@ class Reader:
             start_match, new_token = block.start(self._token)
             if not start_match:
                 continue
-            print(f"FOUND START: \n\ttoken: {self._token}\n\tblock: {block}\n\t new_token: {new_token}")
-            self._process_atom_block(self._token[:start_match.start()])
+            print(
+                f"FOUND START: \n\ttoken: {self._token}\n\tblock: {block}\n\t new_token: {new_token}"
+            )
+            self._process_atom_block(self._token[: start_match.start()])
             self._token = new_token
 
             self._context.append(block(start_match))
