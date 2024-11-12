@@ -2,7 +2,6 @@ import pytest
 from pyndoc.readers.reader import Reader
 import pyndoc.ast.blocks as ast
 
-
 @pytest.fixture
 def gfm_reader():
     return Reader("gfm")

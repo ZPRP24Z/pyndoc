@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any
 import re
 
@@ -12,7 +11,7 @@ class ASTAtomBlock(ASTBlock):
     pattern = ""
     has_content = False
 
-    def __init__(self, name: str, contents: str=""):
+    def __init__(self, name: str, contents: str = ""):
         self.content = contents
         super().__init__(name)
 
@@ -41,9 +40,6 @@ class ASTAtomBlock(ASTBlock):
         cls.has_content = value
 
 
-
-
-
 class ASTCompositeContents:
     def __init__(self, metadata: list, contents: list[ASTBlock]):
         self.metadata = metadata
@@ -54,7 +50,7 @@ class ASTCompositeBlock(ASTBlock):
     start_pattern = ""
     end_pattern = ""
 
-    def __init__(self, name: str, metadata = None, contents = None):
+    def __init__(self, name: str, metadata=None, contents=None):
         metadata = metadata if metadata else []
         contents = contents if contents else []
         self.contents = ASTCompositeContents(metadata, contents)
@@ -66,7 +62,7 @@ class ASTCompositeBlock(ASTBlock):
     @classmethod
     def start(cls, token: str) -> tuple[re.Match | None, str]:
         match = re.search(cls.start_pattern, token)
-        token = token[:match.start()] if match else token
+        token = token[: match.start()] if match else token
         return (match, token)
 
     @classmethod
@@ -112,7 +108,6 @@ class Header(ASTCompositeBlock):
 class Para(ASTCompositeBlock):
     """
     AST block representing a paragraph.
-    It is recommended to make this block None-started and ended, resulting in unmatched text being converted to paragraphs
     """
 
     def __init__(self):
