@@ -8,7 +8,7 @@
 
 The primary goal of the project is to make the CLI easily extensible in terms of new formats.
 
-For development use see [startup instructions](https://github.com/ZPRP24Z/pyndoc/wiki/Startup-Instructions)
+For development use see [development instructions](https://github.com/ZPRP24Z/pyndoc/wiki/Development-Instructions)
 
 ## Documentation
 
