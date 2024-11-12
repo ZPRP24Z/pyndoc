@@ -60,13 +60,19 @@ class ASTCompositeBlock(ASTBlock):
         self.contents.contents.append(block)
 
     @classmethod
-    def start(cls, token: str) -> tuple[re.Match | None, str]:
+    def start(cls, **kwargs) -> tuple[re.Match | None, str]:
+        if "token" not in kwargs:
+            return None, ""
+        token = kwargs["token"]
         match = re.search(cls.start_pattern, token)
         token = token[: match.start()] if match else token
         return (match, token)
 
     @classmethod
-    def end(cls, token: str) -> re.Match | None:
+    def end(cls, **kwargs) -> re.Match | None:
+        if "token" not in kwargs:
+            return None
+        token = kwargs["token"]
         return re.search(cls.end_pattern, token)
 
     @classmethod
@@ -101,7 +107,11 @@ class Header(ASTCompositeBlock):
     AST block representing a heading
     """
 
-    def __init__(self, level: int = 1):
+    def __init__(self, **kwargs):
+        if "level" not in kwargs:
+            level = 1
+        else:
+            level = kwargs["level"]
         super().__init__("Header", [level])
 
 
@@ -110,7 +120,7 @@ class Para(ASTCompositeBlock):
     AST block representing a paragraph.
     """
 
-    def __init__(self):
+    def __init__(self, **_):
         super().__init__("Para")
 
 
@@ -119,7 +129,7 @@ class Emph(ASTCompositeBlock):
     Basic Italic AST block
     """
 
-    def __init__(self):
+    def __init__(self, **_):
         super().__init__("Emph")
 
 
@@ -128,12 +138,12 @@ class Strong(ASTCompositeBlock):
     Basic Bold AST block
     """
 
-    def __init__(self):
+    def __init__(self, **_):
         super().__init__("Strong")
 
 
 class Code(ASTCompositeBlock):
-    def __init__(self):
+    def __init__(self, **_):
         super().__init__("Code")
 
 

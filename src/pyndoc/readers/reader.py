@@ -59,7 +59,7 @@ class Reader:
         check if the current context block has ended
         """
         if len(self._context):
-            end_match = self._context[-1].end(self._token)
+            end_match = self._context[-1].end(token=self._token)
             if not end_match:
                 return
 
@@ -83,7 +83,7 @@ class Reader:
         If so, set the current context as the block
         """
         for block in self._block_types:
-            start_match, new_token = block.start(self._token)
+            start_match, new_token = block.start(token=self._token, context=self._context)
             if not start_match:
                 continue
             print(
@@ -92,7 +92,7 @@ class Reader:
             self._process_atom_block(self._token[: start_match.start()])
             self._token = new_token
 
-            self._context.append(block(start_match))
+            self._context.append(block(match=start_match))
             print(f"ADDED, CURRENT CONTEXT: {self._context}")
 
     def _close_context(self) -> None:
