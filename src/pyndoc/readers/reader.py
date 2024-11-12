@@ -11,6 +11,7 @@ class Reader:
         * block_types - types of composite blocks found in a given language
         * atom_block_types - atom blocks found in a give language
     """
+
     def __init__(self, lang: str):
         self._tree = []
         self._context = []
@@ -69,12 +70,12 @@ class Reader:
             self._end()
 
     def _end(self):
-            # block is processed, move it to finished tree
-            if len(self._context) > 1:
-                item = self._context.pop()
-                self._context[-1].insert(item)
-            else:
-                self._tree.append(self._context.pop())
+        # block is processed, move it to finished tree
+        if len(self._context) > 1:
+            item = self._context.pop()
+            self._context[-1].insert(item)
+        else:
+            self._tree.append(self._context.pop())
 
     def _check_start(self):
         """
@@ -95,7 +96,7 @@ class Reader:
             print(f"ADDED, CURRENT CONTEXT: {self._context}")
 
     def _close_context(self) -> None:
-        while(self._context):
+        while self._context:
             self._process_atom_block(self._token)
             self._end()
 
