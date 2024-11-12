@@ -18,8 +18,8 @@ class Reader:
         self._token = ""
 
         lang_module = importlib.import_module(f"pyndoc.readers.{lang}.tokens")
-        self._block_types = lang_module.starts().keys()
-        self._atom_block_types = lang_module.atomic_patterns().keys()
+        self._block_types = lang_module.declared_tokens.keys()
+        self._atom_block_types = lang_module.declared_atomic_patterns.keys()
 
         lang_module.assign_patterns()
 
