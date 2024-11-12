@@ -49,6 +49,7 @@ class ASTCompositeContents:
 class ASTCompositeBlock(ASTBlock):
     start_pattern = ""
     end_pattern = ""
+    inline = False
 
     def __init__(self, name: str, metadata=None, contents=None):
         metadata = metadata if metadata else []
@@ -83,6 +84,14 @@ class ASTCompositeBlock(ASTBlock):
     def override_end(cls, pattern: str):
         cls.end_pattern = pattern
 
+    @classmethod
+    def override_inline(cls, value: Any) -> None:
+        cls.inline = value
+
+    @classmethod
+    def is_inline(cls) -> Any:
+        return cls.inline
+
 
 class Space(ASTAtomBlock):
     """
@@ -100,6 +109,11 @@ class Str(ASTAtomBlock):
 
     def __init__(self, contents: str = ""):
         super().__init__("Str", contents)
+
+
+class SoftBreak(ASTAtomBlock):
+    def __init__(self):
+        super().__init__("SoftBreak")
 
 
 class Header(ASTCompositeBlock):
@@ -145,17 +159,3 @@ class Strong(ASTCompositeBlock):
 class Code(ASTCompositeBlock):
     def __init__(self, **_):
         super().__init__("Code")
-
-
-# TODO change function name to more informative, probalby refactor
-def decompose_text(text: str) -> list[ASTBlock]:
-    char_chains = text.rstrip().split()
-    blocks = []
-
-    for idx, char_chain in enumerate(char_chains):
-        blocks.append(Str(char_chain))
-
-        if idx != len(char_chains):
-            blocks.append(Space())
-
-    return blocks

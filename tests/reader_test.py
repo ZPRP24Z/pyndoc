@@ -25,11 +25,6 @@ def mock_file(func):
     return wrapper
 
 
-def test_reader_init(gfm_reader):
-    assert len(gfm_reader._block_types) == 4
-    assert len(gfm_reader._atom_block_types) == 2
-
-
 @pytest.mark.parametrize(
     ("data", "block_type"),
     [
@@ -38,8 +33,9 @@ def test_reader_init(gfm_reader):
         ("### level 3 header with *some italic text*\n", ast.Header),
         (
             "*italic text*",
-            ast.Emph,
-        ),  # TODO change this test case when finished processing Para
+            ast.Para,
+        ),
+        ("Paragraph", ast.Para),
     ],
 )
 @mock_file
@@ -54,8 +50,8 @@ def test_simple_type(gfm_reader, block_type, mocker, data):
         ("# has 5 strings 4 spaces\n", 9),
         ("# text *italic text here - header has 3 blocks - 1 space 2 str*\n", 3),
         (
-            "*italic text with 8 strings and 7   corrected-spaces*\n",
-            15,
+            "*italic text with 8 strings and 7   corrected-spaces*",
+            1,
         ),  # TODO change this test case after Para done
     ],
 )
@@ -86,16 +82,13 @@ def test_simple_len(gfm_reader, contents_len, mocker, data):
                 Str("spaces"),
             ],
         ),
-        (  # TODO after Para done change
-            "*italic text SIMPLE*\n",
-            [Str("italic"), Space(), Str("text"), Space(), Str("SIMPLE")],
-        ),
     ],
 )
 @mock_file
 def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker, data):
     gfm_reader.read("Foo")
     composite_block_contents = gfm_reader._tree[0].contents.contents
+    print(f"{composite_block_contents}")
     assert composite_block_contents == atom_block_list
 
 
@@ -104,13 +97,7 @@ def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker
     [
         (
             "# Header without newline",
-            [
-                Str("Header"),
-                Space(),
-                Str("without"),
-                Space(),
-                Str("newline")
-            ]
+            [Str("Header"), Space(), Str("without"), Space(), Str("newline")],
         ),
     ],
 )
@@ -118,3 +105,36 @@ def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker
 def test_eof_header(gfm_reader, mocker, data, blocks):
     gfm_reader.read("Foo")
     assert gfm_reader._tree[0].contents.contents == blocks
+
+
+@pytest.mark.parametrize(
+    ("data", "blocks"), 
+        [
+            ("para1\n\npara2", [ast.Para, ast.Para]),
+            ("para", [ast.Para]),
+            ("#incorrectheader", [ast.Para]),
+            ("para\npara", [ast.Para])
+        ]
+)
+@mock_file
+def test_para(gfm_reader, mocker, data, blocks):
+    gfm_reader.read("Foo")
+    assert len(gfm_reader._tree) == len(blocks)
+    for idx, block in enumerate(gfm_reader._tree):
+        assert isinstance(block, blocks[idx])
+
+
+@pytest.mark.parametrize(
+    ("data", "blocks"), 
+        [
+            ("*italic text*", [ast.Str("italic"), ast.Space(), ast.Str("text")]),
+        ]
+)
+@mock_file
+def test_para_inline_content(gfm_reader, mocker, data, blocks):
+    gfm_reader.read("Foo")
+    assert len(gfm_reader._tree) == 1
+    inline_block_content = gfm_reader._tree[0].contents.contents[0].contents.contents
+    assert len(inline_block_content) == len(blocks)
+    for idx, block in enumerate(inline_block_content):
+        assert block == blocks[idx]

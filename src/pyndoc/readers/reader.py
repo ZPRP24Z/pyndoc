@@ -20,6 +20,7 @@ class Reader:
         lang_module = importlib.import_module(f"pyndoc.readers.{lang}.tokens")
         self._block_types = lang_module.declared_tokens.keys()
         self._atom_block_types = lang_module.declared_atomic_patterns.keys()
+        self._atom_wrapper_block = lang_module.atom_wrapper
 
         lang_module.assign_patterns()
 
@@ -40,8 +41,6 @@ class Reader:
         process an atom block (Str, Space etc.)
         """
         print(f"PROCESSING ATOM BLOCK: {token}")
-        if not self._context:
-            return
 
         atom_block = [
             atom_block
@@ -50,6 +49,9 @@ class Reader:
         ]
         if not atom_block:
             return
+        if not self._context:
+            self._context.append(self._atom_wrapper_block())
+
         args = tuple([token]) if atom_block[0].block_has_content() else ()
         print(f"PROCESSED, ADDING {atom_block[0]} to {self._context[-1]}")
         self._context[-1].insert(atom_block[0](*args))
@@ -60,14 +62,16 @@ class Reader:
         """
         if len(self._context):
             end_match = self._context[-1].end(token=self._token)
-            if not end_match:
-                return
+        else:
+            end_match = self._atom_wrapper_block.end(token=self._token)
+        if not end_match:
+            return
 
-            # process token before the block-end
-            self._process_atom_block(self._token[: end_match.start()])
-            self._token = ""
+        # process token before the block-end
+        self._process_atom_block(self._token[: end_match.start()])
+        self._token = ""
 
-            self._end()
+        self._end()
 
     def _end(self):
         # block is processed, move it to finished tree
@@ -89,16 +93,24 @@ class Reader:
             print(
                 f"FOUND START: \n\ttoken: {self._token}\n\tblock: {block}\n\t new_token: {new_token}"
             )
-            self._process_atom_block(self._token[: start_match.start()])
+            if block.is_inline() and not self._context:
+                self._context.append(self._atom_wrapper_block())
+            else:
+                self._process_atom_block(self._token[: start_match.start()])
             self._token = new_token
 
             self._context.append(block(match=start_match))
             print(f"ADDED, CURRENT CONTEXT: {self._context}")
+            break
 
     def _close_context(self) -> None:
         while self._context:
-            self._process_atom_block(self._token)
+            self._process_trailing_atom()
             self._end()
+
+    def _process_trailing_atom(self) -> None:
+        self._process_atom_block(self._token)
+        self._token = ""
 
     def process(self, char: str):
         """
@@ -120,6 +132,9 @@ class Reader:
             while True:
                 char = fp.read(1)
                 if not char:
+                    print("EOF!")
+                    if not self._context:
+                        self._process_trailing_atom()
                     self._close_context()
                     break
 
