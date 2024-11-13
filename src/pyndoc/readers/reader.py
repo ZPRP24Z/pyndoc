@@ -101,7 +101,8 @@ class Reader:
                 self._process_atom_block(self._token[: start_match.start()])
             self._token = new_token
 
-            self._context.append(block(match=start_match))
+            self._context.append(block())
+            self._context[-1].process_read(match=start_match)
             print(f"ADDED, CURRENT CONTEXT: {self._context}")
             break
 

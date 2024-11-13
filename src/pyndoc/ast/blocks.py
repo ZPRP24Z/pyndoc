@@ -11,16 +11,16 @@ class ASTAtomBlock(ASTBlock):
     has_content = False
 
     def __init__(self, name: str, contents: str = "") -> None:
-        self.content = contents
+        self.contents = contents
         super().__init__(name)
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, ASTAtomBlock):
-            return self.name == other.name and self.content == other.content
+            return self.name == other.name and self.contents == other.contents
         return NotImplemented
 
     def __repr__(self) -> str:
-        return f'{self.name}("{self.content}")'
+        return f'{self.name}("{self.contents}")'
 
     @classmethod
     def match_pattern(cls, text: str) -> re.Match | None:
@@ -61,6 +61,9 @@ class ASTCompositeBlock(ASTBlock):
 
     def insert(self, block: ASTBlock) -> None:
         self.contents.contents.append(block)
+
+    def process_read(self, **_: None) -> None:
+        pass
 
     @classmethod
     def start(cls, **kwargs: str) -> tuple[re.Match | None, str]:
@@ -123,12 +126,8 @@ class Header(ASTCompositeBlock):
     AST block representing a heading
     """
 
-    def __init__(self, **kwargs: int) -> None:
-        if "level" not in kwargs:
-            level = 1
-        else:
-            level = kwargs["level"]
-        super().__init__("Header", [level])
+    def __init__(self) -> None:
+        super().__init__("Header")
 
 
 class Para(ASTCompositeBlock):
@@ -136,7 +135,7 @@ class Para(ASTCompositeBlock):
     AST block representing a paragraph.
     """
 
-    def __init__(self, **_: None) -> None:
+    def __init__(self) -> None:
         super().__init__("Para")
 
 
@@ -145,7 +144,7 @@ class Emph(ASTCompositeBlock):
     Basic Italic AST block
     """
 
-    def __init__(self, **_: None) -> None:
+    def __init__(self) -> None:
         super().__init__("Emph")
 
 
@@ -154,10 +153,10 @@ class Strong(ASTCompositeBlock):
     Basic Bold AST block
     """
 
-    def __init__(self, **_: None) -> None:
+    def __init__(self) -> None:
         super().__init__("Strong")
 
 
 class Code(ASTCompositeBlock):
-    def __init__(self, **_: None) -> None:
+    def __init__(self) -> None:
         super().__init__("Code")

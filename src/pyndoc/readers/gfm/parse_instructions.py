@@ -4,13 +4,16 @@ import pyndoc.ast.blocks as ast
 
 
 class Header(ast.Header):
-    def __init__(self, **kwargs: re.Match) -> None:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def process_read(self, **kwargs: re.Match) -> None:
         if "match" not in kwargs:
             level = 1
         else:
             match = kwargs["match"]
             level = len(match.group("h"))
-        super().__init__(level=level)
+        self.contents.metadata = [level]
 
 
 class Emph(ast.Emph):
