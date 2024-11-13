@@ -31,5 +31,5 @@ class Emph(ast.Emph):
         return (match, token)
 
     @classmethod
-    def handle_premature_closure(cls, token):
+    def handle_premature_closure(cls, token: str) -> str:
         return token[:-1] if token[-1] == "*" else token
