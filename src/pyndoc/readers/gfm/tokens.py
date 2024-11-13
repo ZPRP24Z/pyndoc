@@ -33,7 +33,7 @@ declared_atomic_patterns = {
     }
 
 
-def assign_patterns():
+def assign_patterns() -> None:
     start_dict = declared_tokens
     end_dict = declared_ends
     atomic_patterns_dict = declared_atomic_patterns

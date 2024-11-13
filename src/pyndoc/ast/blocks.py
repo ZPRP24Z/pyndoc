@@ -1,9 +1,8 @@
-from typing import Any
 import re
 
 
 class ASTBlock:
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
 
 
@@ -11,16 +10,16 @@ class ASTAtomBlock(ASTBlock):
     pattern = ""
     has_content = False
 
-    def __init__(self, name: str, contents: str = ""):
+    def __init__(self, name: str, contents: str = "") -> None:
         self.content = contents
         super().__init__(name)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, ASTAtomBlock):
             return self.name == other.name and self.content == other.content
         return NotImplemented
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.name}("{self.content}")'
 
     @classmethod
@@ -35,16 +34,16 @@ class ASTAtomBlock(ASTBlock):
         cls.pattern = pattern
 
     @classmethod
-    def block_has_content(cls) -> Any:
+    def block_has_content(cls) -> bool:
         return cls.has_content
 
     @classmethod
-    def override_has_content(cls, value: Any) -> None:
+    def override_has_content(cls, value: bool) -> None:
         cls.has_content = value
 
 
 class ASTCompositeContents:
-    def __init__(self, metadata: list, contents: list[ASTBlock]):
+    def __init__(self, metadata: list, contents: list[ASTBlock]) -> None:
         self.metadata = metadata
         self.contents = contents
 
@@ -54,7 +53,7 @@ class ASTCompositeBlock(ASTBlock):
     end_pattern = ""
     inline = False
 
-    def __init__(self, name: str, metadata=None, contents=None):
+    def __init__(self, name: str, metadata: list | None = None, contents: list | None = None) -> None:
         metadata = metadata if metadata else []
         contents = contents if contents else []
         self.contents = ASTCompositeContents(metadata, contents)
@@ -64,7 +63,7 @@ class ASTCompositeBlock(ASTBlock):
         self.contents.contents.append(block)
 
     @classmethod
-    def start(cls, **kwargs) -> tuple[re.Match | None, str]:
+    def start(cls, **kwargs: str) -> tuple[re.Match | None, str]:
         if "token" not in kwargs:
             return None, ""
         token = kwargs["token"]
@@ -73,7 +72,7 @@ class ASTCompositeBlock(ASTBlock):
         return (match, token)
 
     @classmethod
-    def end(cls, **kwargs) -> re.Match | None:
+    def end(cls, **kwargs: str) -> re.Match | None:
         if "token" not in kwargs:
             return None
         token = kwargs["token"]
@@ -84,15 +83,15 @@ class ASTCompositeBlock(ASTBlock):
         cls.start_pattern = pattern
 
     @classmethod
-    def override_end(cls, pattern: str):
+    def override_end(cls, pattern: str) -> None:
         cls.end_pattern = pattern
 
     @classmethod
-    def override_inline(cls, value: Any) -> None:
+    def override_inline(cls, value: bool) -> None:
         cls.inline = value
 
     @classmethod
-    def is_inline(cls) -> Any:
+    def is_inline(cls) -> bool:
         return cls.inline
 
 
@@ -101,7 +100,7 @@ class Space(ASTAtomBlock):
     AST Atom block representing whitespace
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Space")
 
 
@@ -110,12 +109,12 @@ class Str(ASTAtomBlock):
     special AST block representing string without whitespace characters
     """
 
-    def __init__(self, contents: str = ""):
+    def __init__(self, contents: str = "") -> None:
         super().__init__("Str", contents)
 
 
 class SoftBreak(ASTAtomBlock):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("SoftBreak")
 
 
@@ -124,7 +123,7 @@ class Header(ASTCompositeBlock):
     AST block representing a heading
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: int) -> None:
         if "level" not in kwargs:
             level = 1
         else:
@@ -137,7 +136,7 @@ class Para(ASTCompositeBlock):
     AST block representing a paragraph.
     """
 
-    def __init__(self, **_):
+    def __init__(self, **_: None) -> None:
         super().__init__("Para")
 
 
@@ -146,7 +145,7 @@ class Emph(ASTCompositeBlock):
     Basic Italic AST block
     """
 
-    def __init__(self, **_):
+    def __init__(self, **_: None) -> None:
         super().__init__("Emph")
 
 
@@ -155,10 +154,10 @@ class Strong(ASTCompositeBlock):
     Basic Bold AST block
     """
 
-    def __init__(self, **_):
+    def __init__(self, **_: None) -> None:
         super().__init__("Strong")
 
 
 class Code(ASTCompositeBlock):
-    def __init__(self, **_):
+    def __init__(self, **_: None) -> None:
         super().__init__("Code")

@@ -38,8 +38,8 @@ preview = true
 
 [lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
-select = ["E3", "E7", "E9", "F"]
-ignore = []
+select = ["E", "ANN", "F", "ERA"]
+ignore = ["E501"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -60,3 +60,6 @@ skip-magic-trailing-comma = false
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
+
+[lint.per-file-ignores]
+"tests/*" = ["ANN"]

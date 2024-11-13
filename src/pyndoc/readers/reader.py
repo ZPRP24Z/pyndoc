@@ -12,7 +12,7 @@ class Reader:
         * atom_block_types - atom blocks found in a give language
     """
 
-    def __init__(self, lang: str):
+    def __init__(self, lang: str) -> None:
         self._tree = []
         self._context = []
         self._token = ""
@@ -24,7 +24,7 @@ class Reader:
 
         lang_module.assign_patterns()
 
-    def _check_atom_block(self):
+    def _check_atom_block(self) -> None:
         """
         Check if an atom block has ended.
         That is, if matching it with a next character results in None (but previously matched)
@@ -36,7 +36,7 @@ class Reader:
                 old_token, self._token = self._token[:-1], self._token[-1:]
                 self._process_atom_block(old_token)
 
-    def _process_atom_block(self, token: str):
+    def _process_atom_block(self, token: str) -> None:
         """
         process an atom block (Str, Space etc.)
         """
@@ -56,7 +56,7 @@ class Reader:
         print(f"PROCESSED, ADDING {atom_block[0]} to {self._context[-1]}")
         self._context[-1].insert(atom_block[0](*args))
 
-    def _check_end(self):
+    def _check_end(self) -> None:
         """
         check if the current context block has ended
         """
@@ -73,7 +73,7 @@ class Reader:
 
         self._end()
 
-    def _end(self):
+    def _end(self) -> None:
         # block is processed, move it to finished tree
         if len(self._context) > 1:
             item = self._context.pop()
@@ -81,7 +81,7 @@ class Reader:
         else:
             self._tree.append(self._context.pop())
 
-    def _check_start(self):
+    def _check_start(self) -> None:
         """
         Check if a new block has just started.
         If so, set the current context as the block
@@ -112,7 +112,7 @@ class Reader:
         self._process_atom_block(self._token)
         self._token = ""
 
-    def process(self, char: str):
+    def process(self, char: str) -> None:
         """
         Process a current token
         taking into consideration the current context tree, check if
@@ -123,7 +123,7 @@ class Reader:
         self._check_start()
         self._check_atom_block()
 
-    def read(self, filename: str):
+    def read(self, filename: str) -> None:
         """
         Open and read a file one character at a time,
         then pass the character to tokenizer
