@@ -1,4 +1,3 @@
-import re
 from pyndoc.ast.basic_blocks import ASTAtomBlock, ASTCompositeBlock
 
 
