@@ -5,21 +5,21 @@ INLINE = True
 
 # How do composite blocks start?
 declared_tokens = {
-        gfm.Header: (r"^(?P<h>#{1,6}) ", not INLINE),
-        ast.Strong: (r"\*\*", INLINE),
-        gfm.Emph: (r"\*[^*]{1}", INLINE),
-        ast.Code: (r"`", INLINE)
-        # The atom wrapper does not need to be declared here
-    }
+    gfm.Header: (r"^(?P<h>#{1,6}) ", not INLINE),
+    ast.Strong: (r"\*\*", INLINE),
+    gfm.Emph: (r"\*[^*]{1}", INLINE),
+    ast.Code: (r"`", INLINE),
+    # The atom wrapper does not need to be declared here
+}
 
 
 # How do composite blocks end?
 declared_ends = {
-        ast.Strong: r"\*\*",
-        gfm.Emph: r"\*",
-        ast.Para: r"\n\n",
-        ast.ASTCompositeBlock: r"(\n)$",  # DEFAULT
-    }
+    ast.Strong: r"\*\*",
+    gfm.Emph: r"\*",
+    ast.Para: r"\n\n",
+    ast.ASTCompositeBlock: r"(\n)$",  # DEFAULT
+}
 
 
 # what block to use if an atom block is found without context? (not within other blocks)
@@ -27,10 +27,10 @@ atom_wrapper = ast.Para
 
 # how should we define atomic patterns? (blocks not containing other blocks)
 declared_atomic_patterns = {
-        ast.Space: (r"^[ ]+$", False),
-        ast.Str: (r"^[^\s\n]+$", True),
-        ast.SoftBreak: (r"^\n(?!\n)", False),
-    }
+    ast.Space: (r"^[ ]+$", False),
+    ast.Str: (r"^[^\s\n]+$", True),
+    ast.SoftBreak: (r"^\n(?!\n)", False),
+}
 
 
 def assign_patterns():
