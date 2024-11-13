@@ -196,4 +196,8 @@ class ASTCompositeBlock(ASTBlock):
 
     @classmethod
     def handle_premature_closure(cls, token: str) -> str:
+        """
+        Used when when the file has ended, but context has not been closed
+        Potentially modify recieved token end return it
+        """
         return token
