@@ -25,7 +25,10 @@ class ASTAtomBlock(ASTBlock):
 
     @classmethod
     def match_pattern(cls, text: str) -> re.Match | None:
-        return re.search(cls.pattern, text)
+        match = re.search(cls.pattern, text)
+        if match and len(text) != match.end():
+            return None
+        return match
 
     @classmethod
     def override_match_pattern(cls, pattern: str) -> None:

@@ -128,6 +128,7 @@ def test_para(gfm_reader, mocker, data, blocks):
     ("data", "blocks"), 
         [
             ("*italic text*", [ast.Str("italic"), ast.Space(), ast.Str("text")]),
+            ("*italic\ntext*", [ast.Str("italic"), ast.SoftBreak(), ast.Str("text")]),
         ]
 )
 @mock_file
@@ -135,6 +136,7 @@ def test_para_inline_content(gfm_reader, mocker, data, blocks):
     gfm_reader.read("Foo")
     assert len(gfm_reader._tree) == 1
     inline_block_content = gfm_reader._tree[0].contents.contents[0].contents.contents
+    print(inline_block_content)
     assert len(inline_block_content) == len(blocks)
     for idx, block in enumerate(inline_block_content):
         assert block == blocks[idx]
