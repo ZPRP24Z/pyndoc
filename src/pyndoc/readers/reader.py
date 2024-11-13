@@ -61,15 +61,15 @@ class Reader:
         check if the current context block has ended
         """
         if len(self._context):
-            end_match = self._context[-1].end(token=self._token)
+            end_match, new_token = self._context[-1].end(token=self._token)
         else:
-            end_match = self._atom_wrapper_block.end(token=self._token)
+            end_match, new_token = self._atom_wrapper_block.end(token=self._token)
         if not end_match:
             return
 
         # process token before the block-end
         self._process_atom_block(self._token[: end_match.start()])
-        self._token = ""
+        self._token = new_token
 
         self._end()
 
@@ -87,9 +87,7 @@ class Reader:
         If so, set the current context as the block
         """
         for block in self._block_types:
-            start_match, new_token = block.start(
-                token=self._token, context=self._context
-            )
+            start_match, new_token = block.start(token=self._token, context=self._context)
             if not start_match:
                 continue
             print(
@@ -108,6 +106,8 @@ class Reader:
 
     def _close_context(self) -> None:
         while self._context:
+            if self._token:
+                self._token = self._context[-1].handle_premature_closure(self._token)
             self._process_trailing_atom()
             self._end()
 

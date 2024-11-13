@@ -22,9 +22,14 @@ class Emph(ast.Emph):
 
     @classmethod
     def start(cls, **kwargs: str) -> tuple[re.Match | None, str]:
+        print("w gfm emph start")
         if "token" not in kwargs:
             return None, ""
         token = kwargs["token"]
         match = re.search(cls.start_pattern, token)
         token = token[-1:] if match else token
         return (match, token)
+
+    @classmethod
+    def handle_premature_closure(cls, token):
+        return token[:-1] if token[-1] == "*" else token

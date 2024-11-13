@@ -5,6 +5,7 @@ class ASTBlock:
     """
     Definition of a base AST block containing just a name
     """
+
     def __init__(self, name: str) -> None:
         self.name = name
 
@@ -17,6 +18,7 @@ class ASTAtomBlock(ASTBlock):
         * pattern -- regex pattern defining the block (default: "")
         * has_content -- boolean describing if the block has any content (defualt: False)
     """
+
     pattern = ""
     has_content = False
 
@@ -79,6 +81,7 @@ class ASTCompositeContents:
     """
     The representation of a composite block's contents
     """
+
     def __init__(self, metadata: list, contents: list[ASTBlock]) -> None:
         """
         Keyword arguments:
@@ -98,11 +101,14 @@ class ASTCompositeBlock(ASTBlock):
         * end_pattern -- string representing the block's end
         * inline -- flag showing if the block is an inline block
     """
+
     start_pattern = ""
     end_pattern = ""
     inline = False
 
-    def __init__(self, name: str, metadata: list | None = None, contents: list | None = None) -> None:
+    def __init__(
+        self, name: str, metadata: list | None = None, contents: list | None = None
+    ) -> None:
         """
         Keyword arguments:
             * name -- the name of the block
@@ -154,9 +160,11 @@ class ASTCompositeBlock(ASTBlock):
             * token -- string representing current token to be matched against pattern
         """
         if "token" not in kwargs:
-            return None
+            return None, ""
         token = kwargs["token"]
-        return re.search(cls.end_pattern, token)
+        match = re.search(cls.end_pattern, token)
+        token = token[match.end() :] if match else token
+        return (match, token)
 
     @classmethod
     def override_start(cls, pattern: str) -> None:
@@ -185,3 +193,7 @@ class ASTCompositeBlock(ASTBlock):
         Check if a given block type is inline, default: False
         """
         return cls.inline
+
+    @classmethod
+    def handle_premature_closure(cls, token: str) -> str:
+        return token

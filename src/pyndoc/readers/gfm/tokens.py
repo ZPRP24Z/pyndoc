@@ -17,7 +17,7 @@ declared_tokens = {
 # How do composite blocks end?
 declared_ends = {
     ast.Strong: r"\*\*",
-    gfm.Emph: r"\*",
+    gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
     ast_base.ASTCompositeBlock: r"(\n)$",  # DEFAULT
 }
