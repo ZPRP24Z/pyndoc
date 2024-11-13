@@ -108,13 +108,13 @@ def test_eof_header(gfm_reader, mocker, data, blocks):
 
 
 @pytest.mark.parametrize(
-    ("data", "blocks"), 
-        [
-            ("para1\n\npara2", [ast.Para, ast.Para]),
-            ("para", [ast.Para]),
-            ("#incorrectheader", [ast.Para]),
-            ("para\npara", [ast.Para])
-        ]
+    ("data", "blocks"),
+    [
+        ("para1\n\npara2", [ast.Para, ast.Para]),
+        ("para", [ast.Para]),
+        ("#incorrectheader", [ast.Para]),
+        ("para\npara", [ast.Para]),
+    ],
 )
 @mock_file
 def test_para(gfm_reader, mocker, data, blocks):
@@ -125,18 +125,62 @@ def test_para(gfm_reader, mocker, data, blocks):
 
 
 @pytest.mark.parametrize(
-    ("data", "blocks"), 
-        [
-            ("*italic text*", [ast.Str("italic"), ast.Space(), ast.Str("text")]),
-            ("*italic\ntext*", [ast.Str("italic"), ast.SoftBreak(), ast.Str("text")]),
-        ]
+    ("data", "type", "blocks"),
+    [
+        ("*italic text*", ast.Emph, [ast.Str("italic"), ast.Space(), ast.Str("text")]),
+        (
+            "*italic\ntext*",
+            ast.Emph,
+            [ast.Str("italic"), ast.SoftBreak(), ast.Str("text")],
+        ),
+        ("**bold**", ast.Strong, [Str("bold")]),
+        (
+            "**here is   bold text",
+            ast.Strong,
+            [
+                ast.Str("here"),
+                Space(),
+                Str("is"),
+                Space(),
+                Str("bold"),
+                Space(),
+                Str("text"),
+            ],
+        ),
+    ],
 )
 @mock_file
-def test_para_inline_content(gfm_reader, mocker, data, blocks):
+def test_para_inline_content(gfm_reader, mocker, data, type, blocks):
     gfm_reader.read("Foo")
     assert len(gfm_reader._tree) == 1
-    inline_block_content = gfm_reader._tree[0].contents.contents[0].contents.contents
-    print(inline_block_content)
-    assert len(inline_block_content) == len(blocks)
-    for idx, block in enumerate(inline_block_content):
+    inline_block = gfm_reader._tree[0].contents.contents[0]
+    assert isinstance(inline_block, type)
+    assert len(inline_block.contents.contents) == len(blocks)
+    for idx, block in enumerate(inline_block.contents.contents):
         assert block == blocks[idx]
+
+
+@pytest.mark.parametrize(
+    ("data", "atom_blocks"),
+    [
+        ("string\n", [ast.Str("string"), ast.SoftBreak()]),
+        (
+            "string\nwith\nSoftbreaks",
+            [
+                ast.Str("string"),
+                ast.SoftBreak(),
+                ast.Str("with"),
+                ast.SoftBreak(),
+                ast.Str("Softbreaks"),
+            ],
+        ),
+    ],
+)
+@mock_file
+def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
+    gfm_reader.read("Foo")
+    assert len(gfm_reader._tree) == 1
+    assert isinstance(gfm_reader._tree[0], ast.Para)
+    read_blocks = gfm_reader._tree[0].contents.contents
+    print(read_blocks)
+    assert read_blocks == atom_blocks

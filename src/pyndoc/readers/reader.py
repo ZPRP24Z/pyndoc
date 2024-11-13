@@ -87,7 +87,9 @@ class Reader:
         If so, set the current context as the block
         """
         for block in self._block_types:
-            start_match, new_token = block.start(token=self._token, context=self._context)
+            start_match, new_token = block.start(
+                token=self._token, context=self._context
+            )
             if not start_match:
                 continue
             print(
