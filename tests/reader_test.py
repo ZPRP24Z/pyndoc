@@ -2,7 +2,6 @@ import pytest
 import functools
 from pyndoc.readers.reader import Reader
 import pyndoc.ast.blocks as ast
-from pyndoc.ast.blocks import Space, Str
 
 
 @pytest.fixture
@@ -52,7 +51,7 @@ def test_simple_type(gfm_reader, block_type, mocker, data):
         (
             "*italic text with 8 strings and 7   corrected-spaces*",
             1,
-        ),  # TODO change this test case after Para done
+        ),
     ],
 )
 @mock_file
@@ -66,20 +65,26 @@ def test_simple_len(gfm_reader, contents_len, mocker, data):
     [
         (
             "# level one header\n",
-            [Str("level"), Space(), Str("one"), Space(), Str("header")],
+            [
+                ast.Str("level"),
+                ast.Space(),
+                ast.Str("one"),
+                ast.Space(),
+                ast.Str("header"),
+            ],
         ),
         (
             "## header with   too much    spaces\n",
             [
-                Str("header"),
-                Space(),
-                Str("with"),
-                Space(),
-                Str("too"),
-                Space(),
-                Str("much"),
-                Space(),
-                Str("spaces"),
+                ast.Str("header"),
+                ast.Space(),
+                ast.Str("with"),
+                ast.Space(),
+                ast.Str("too"),
+                ast.Space(),
+                ast.Str("much"),
+                ast.Space(),
+                ast.Str("spaces"),
             ],
         ),
     ],
@@ -97,7 +102,13 @@ def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker
     [
         (
             "# Header without newline",
-            [Str("Header"), Space(), Str("without"), Space(), Str("newline")],
+            [
+                ast.Str("Header"),
+                ast.Space(),
+                ast.Str("without"),
+                ast.Space(),
+                ast.Str("newline"),
+            ],
         ),
     ],
 )
@@ -129,22 +140,27 @@ def test_para(gfm_reader, mocker, data, blocks):
     [
         ("*italic text*", ast.Emph, [ast.Str("italic"), ast.Space(), ast.Str("text")]),
         (
-            "*italic\ntext*",
+            "*unfinished italic",
+            ast.Emph,
+            [ast.Str("unfinished"), ast.Space(), ast.Str("italic")],
+        ),
+        (
+            "*italic\ntext* cos tu",
             ast.Emph,
             [ast.Str("italic"), ast.SoftBreak(), ast.Str("text")],
         ),
-        ("**bold**", ast.Strong, [Str("bold")]),
+        ("**bold**", ast.Strong, [ast.Str("bold")]),
         (
             "**here is   bold text",
             ast.Strong,
             [
                 ast.Str("here"),
-                Space(),
-                Str("is"),
-                Space(),
-                Str("bold"),
-                Space(),
-                Str("text"),
+                ast.Space(),
+                ast.Str("is"),
+                ast.Space(),
+                ast.Str("bold"),
+                ast.Space(),
+                ast.Str("text"),
             ],
         ),
     ],
@@ -184,3 +200,20 @@ def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
     read_blocks = gfm_reader._tree[0].contents.contents
     print(read_blocks)
     assert read_blocks == atom_blocks
+
+
+@pytest.mark.parametrize(
+    ("data", "outside_type", "nested_type", "pos_idx"),
+    [
+        ("**here is nested *italic* and sth**", ast.Strong, ast.Emph, 6),
+        ("**nested *italic***", ast.Strong, ast.Emph, 2),
+        ("*inside italic **strong** and sth*", ast.Emph, ast.Strong, 4),
+    ],
+)
+@mock_file
+def test_nested_inlines(gfm_reader, mocker, data, outside_type, nested_type, pos_idx):
+    gfm_reader.read("Foo")
+    outside_inline = gfm_reader._tree[0].contents.contents[0]
+    print(outside_inline.contents.contents)
+    assert isinstance(outside_inline, outside_type)
+    assert isinstance(outside_inline.contents.contents[pos_idx], nested_type)
