@@ -1,4 +1,5 @@
 import pyndoc.ast.blocks as ast
+import pyndoc.ast.basic_blocks as ast_base
 import pyndoc.readers.gfm.parse_instructions as gfm
 
 INLINE = True
@@ -18,7 +19,7 @@ declared_ends = {
     ast.Strong: r"\*\*",
     gfm.Emph: r"\*",
     ast.Para: r"\n\n",
-    ast.ASTCompositeBlock: r"(\n)$",  # DEFAULT
+    ast_base.ASTCompositeBlock: r"(\n)$",  # DEFAULT
 }
 
 
