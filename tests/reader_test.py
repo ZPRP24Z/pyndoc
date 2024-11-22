@@ -93,7 +93,6 @@ def test_simple_len(gfm_reader, contents_len, mocker, data):
 def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker, data):
     gfm_reader.read("Foo")
     composite_block_contents = gfm_reader._tree[0].contents.contents
-    print(f"{composite_block_contents}")
     assert composite_block_contents == atom_block_list
 
 
@@ -198,7 +197,6 @@ def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
     assert len(gfm_reader._tree) == 1
     assert isinstance(gfm_reader._tree[0], ast.Para)
     read_blocks = gfm_reader._tree[0].contents.contents
-    print(read_blocks)
     assert read_blocks == atom_blocks
 
 
@@ -214,6 +212,54 @@ def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
 def test_nested_inlines(gfm_reader, mocker, data, outside_type, nested_type, pos_idx):
     gfm_reader.read("Foo")
     outside_inline = gfm_reader._tree[0].contents.contents[0]
-    print(outside_inline.contents.contents)
     assert isinstance(outside_inline, outside_type)
     assert isinstance(outside_inline.contents.contents[pos_idx], nested_type)
+
+
+@pytest.mark.parametrize(
+    ("data", "plain_amt", "plain_content_amt"),
+    [
+        ("* bullet list", 1, 3),
+        ("+ bullet list", 1, 3),
+        ("- bullet list", 1, 3),
+        ("* bullet list\n* bullet list 2", 2, 8),
+        ("   * bullet", 1, 1),
+    ],
+)
+@mock_file
+def test_bulletlist(gfm_reader, mocker, data, plain_amt, plain_content_amt):
+    gfm_reader.read("Foo")
+    bullet_list = gfm_reader._tree[0].contents.contents
+    assert len(bullet_list) == plain_amt
+    plain_sum = 0
+    for plain in bullet_list:
+        assert plain.name == "Plain"
+        plain_sum += len(plain.contents.contents)
+
+    assert plain_sum == plain_content_amt
+
+
+@pytest.mark.parametrize(
+    ("data", "types"),
+    [
+        ("* bullet list\n  * nested bullet", ["Plain", "BulletList"]),
+        (
+            "* bullet list\n  * nested bullet\n* old bullet",
+            ["Plain", "BulletList", "Plain"],
+        ),
+        (
+            "* bullet list\n  - nested bullet\n* old bullet",
+            ["Plain", "BulletList", "Plain"],
+        ),
+        (
+            "+ bullet list\n  - nested bullet\n+ old bullet",
+            ["Plain", "BulletList", "Plain"],
+        ),
+    ],
+)
+@mock_file
+def test_nested_bullet(gfm_reader, mocker, data, types):
+    gfm_reader.read("Foo")
+    bullet_list = gfm_reader._tree[0].contents.contents
+    for idx, item in enumerate(bullet_list):
+        assert item.name == types[idx]

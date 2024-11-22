@@ -30,8 +30,10 @@ class Reader:
         That is, if matching it with a next character results in None (but previously matched)
         """
         for atom_block in self._atom_block_types:
-            if not atom_block.match_pattern(self._token) and atom_block.match_pattern(
-                self._token[:-1]
+            if not atom_block.match_pattern(
+                text=self._token, context=self._context
+            ) and atom_block.match_pattern(
+                text=self._token[:-1], context=self._context
             ):
                 old_token, self._token = self._token[:-1], self._token[-1:]
                 self._process_atom_block(old_token)
@@ -40,12 +42,11 @@ class Reader:
         """
         process an atom block (Str, Space etc.)
         """
-        print(f"PROCESSING ATOM BLOCK: {token}")
 
         atom_block = [
             atom_block
             for atom_block in self._atom_block_types
-            if atom_block.match_pattern(token)
+            if atom_block.match_pattern(text=token, context=self._context)
         ]
         if not atom_block:
             return
@@ -53,7 +54,6 @@ class Reader:
             self._context.append(self._atom_wrapper_block())
 
         args = tuple([token]) if atom_block[0].block_has_content() else ()
-        print(f"PROCESSED, ADDING {atom_block[0]} to {self._context[-1]}")
         self._context[-1].insert(atom_block[0](*args))
 
     def _check_end(self) -> None:
@@ -61,9 +61,13 @@ class Reader:
         check if the current context block has ended
         """
         if len(self._context):
-            end_match, new_token = self._context[-1].end(token=self._token)
+            end_match, new_token = self._context[-1].end(
+                token=self._token, context=self._context
+            )
         else:
-            end_match, new_token = self._atom_wrapper_block.end(token=self._token)
+            end_match, new_token = self._atom_wrapper_block.end(
+                token=self._token, context=self._context
+            )
         if not end_match:
             return
 
@@ -87,12 +91,12 @@ class Reader:
         If so, set the current context as the block
         """
         for block in self._block_types:
-            start_match, new_token = block.start(token=self._token, context=self._context)
-            if not start_match:
-                continue
-            print(
-                f"FOUND START: \n\ttoken: {self._token}\n\tblock: {block}\n\t new_token: {new_token}"
+            start_match, new_token = block.start(
+                token=self._token, context=self._context
             )
+            if not start_match:
+                self._token = new_token
+                continue
             if block.is_inline() and not self._context:
                 self._context.append(self._atom_wrapper_block())
             else:
@@ -100,8 +104,7 @@ class Reader:
             self._token = new_token
 
             self._context.append(block())
-            self._context[-1].process_read(match=start_match)
-            print(f"ADDED, CURRENT CONTEXT: {self._context}")
+            self._context[-1].process_read(match=start_match, context=self._context)
             break
 
     def _close_context(self) -> None:
@@ -135,7 +138,6 @@ class Reader:
             while True:
                 char = fp.read(1)
                 if not char:
-                    print("EOF!")
                     if not self._context:
                         self._process_trailing_atom()
                     self._close_context()

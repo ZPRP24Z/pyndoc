@@ -63,3 +63,13 @@ class Strong(ASTCompositeBlock):
 class Code(ASTCompositeBlock):
     def __init__(self) -> None:
         super().__init__("Code")
+
+
+class BulletList(ASTCompositeBlock):
+    def __init__(self) -> None:
+        super().__init__("BulletList")
+
+
+class Plain(ASTCompositeBlock):
+    def __init__(self) -> None:
+        super().__init__("Plain")

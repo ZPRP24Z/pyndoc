@@ -8,6 +8,7 @@ INLINE = True
 declared_tokens = {
     gfm.Header: (r"^(?P<h>#{1,6}) ", not INLINE),
     ast.Strong: (r"\*\*", INLINE),
+    gfm.BulletList: (r"^(?P<s>[\t|\s]*)[\*|\+|\-] ", not INLINE),
     gfm.Emph: (r"\*[^*]{1}", INLINE),
     ast.Code: (r"`", INLINE),
     # The atom wrapper does not need to be declared here
@@ -19,6 +20,7 @@ declared_ends = {
     ast.Strong: r"\*\*",
     gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
+    gfm.BulletList: r"non-ending-placeholder",
     ast_base.ASTCompositeBlock: r"(\n)$",  # DEFAULT
 }
 
@@ -28,7 +30,7 @@ atom_wrapper = ast.Para
 
 # how should we define atomic patterns? (blocks not containing other blocks)
 declared_atomic_patterns = {
-    ast.Space: (r"^[ ]+$", False),
+    gfm.Space: (r"^[ ]+$", False),
     ast.Str: (r"^[^\s\n]+$", True),
     ast.SoftBreak: (r"^\n(?!\n)", False),
 }

@@ -1,4 +1,6 @@
 import re
+from typing import TypedDict
+from typing_extensions import Unpack
 
 
 class ASTBlock:
@@ -8,6 +10,26 @@ class ASTBlock:
 
     def __init__(self, name: str) -> None:
         self.name = name
+
+
+class StartParams(TypedDict):
+    context: list
+    token: str
+
+
+class EndParams(TypedDict):
+    context: list
+    token: str
+
+
+class ProcessParams(TypedDict):
+    context: list
+    match: re.Match
+
+
+class AtomMatchParams(TypedDict):
+    context: list
+    text: str
 
 
 class ASTAtomBlock(ASTBlock):
@@ -40,13 +62,14 @@ class ASTAtomBlock(ASTBlock):
         return f'{self.name}("{self.contents}")'
 
     @classmethod
-    def match_pattern(cls, text: str) -> re.Match | None:
+    def match_pattern(cls, **kwargs: Unpack[AtomMatchParams]) -> re.Match | None:
         """
         Check if the block matches a given token.
         Returns a regex match (or None if match failed)
         Keyword arguments:
             * text -- the token to be matched against the pattern attribute
         """
+        text = kwargs["text"]
         match = re.search(cls.pattern, text)
         if match and len(text) != match.end():
             return None
@@ -128,7 +151,7 @@ class ASTCompositeBlock(ASTBlock):
         """
         self.contents.contents.append(block)
 
-    def process_read(self, **_: None) -> None:
+    def process_read(self, **_: Unpack[ProcessParams]) -> None:
         """
         Process additional keyword arguments after block initialization.
         Not used here, the function is meant to be used inside of
@@ -137,30 +160,26 @@ class ASTCompositeBlock(ASTBlock):
         pass
 
     @classmethod
-    def start(cls, **kwargs: str) -> tuple[re.Match | None, str]:
+    def start(cls, **kwargs: Unpack[StartParams]) -> tuple[re.Match | None, str]:
         """
         Check if a block has started.
         Returns a match if matched, otherwise None
         Expected keyword arguments:
             * token -- string representing current token to be matched against pattern
         """
-        if "token" not in kwargs:
-            return None, ""
         token = kwargs["token"]
         match = re.search(cls.start_pattern, token)
         token = token[: match.start()] if match else token
         return (match, token)
 
     @classmethod
-    def end(cls, **kwargs: str) -> re.Match | None:
+    def end(cls, **kwargs: Unpack[EndParams]) -> tuple[re.Match | None, str]:
         """
         Check if a block has ended.
         Returns a match if matched, otherwise None
         Expected keyword arguments:
             * token -- string representing current token to be matched against pattern
         """
-        if "token" not in kwargs:
-            return None, ""
         token = kwargs["token"]
         match = re.search(cls.end_pattern, token)
         token = token[match.end() :] if match else token
