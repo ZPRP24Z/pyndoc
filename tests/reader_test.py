@@ -40,7 +40,7 @@ def mock_file(func):
 @mock_file
 def test_simple_type(gfm_reader, block_type, mocker, data):
     gfm_reader.read(filename="Foo")
-    assert isinstance(gfm_reader._tree[0], block_type)
+    assert isinstance(gfm_reader._parser._tree[0], block_type)
 
 
 @pytest.mark.parametrize(
@@ -57,7 +57,7 @@ def test_simple_type(gfm_reader, block_type, mocker, data):
 @mock_file
 def test_simple_len(gfm_reader, contents_len, mocker, data):
     gfm_reader.read("Foo")
-    assert len(gfm_reader._tree[0].contents.contents) == contents_len
+    assert len(gfm_reader._parser._tree[0].contents.contents) == contents_len
 
 
 @pytest.mark.parametrize(
@@ -92,7 +92,7 @@ def test_simple_len(gfm_reader, contents_len, mocker, data):
 @mock_file
 def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker, data):
     gfm_reader.read("Foo")
-    composite_block_contents = gfm_reader._tree[0].contents.contents
+    composite_block_contents = gfm_reader._parser._tree[0].contents.contents
     assert composite_block_contents == atom_block_list
 
 
@@ -114,7 +114,7 @@ def test_composite_blocks_with_atom_contents(gfm_reader, atom_block_list, mocker
 @mock_file
 def test_eof_header(gfm_reader, mocker, data, blocks):
     gfm_reader.read("Foo")
-    assert gfm_reader._tree[0].contents.contents == blocks
+    assert gfm_reader._parser._tree[0].contents.contents == blocks
 
 
 @pytest.mark.parametrize(
@@ -129,8 +129,8 @@ def test_eof_header(gfm_reader, mocker, data, blocks):
 @mock_file
 def test_para(gfm_reader, mocker, data, blocks):
     gfm_reader.read("Foo")
-    assert len(gfm_reader._tree) == len(blocks)
-    for idx, block in enumerate(gfm_reader._tree):
+    assert len(gfm_reader._parser._tree) == len(blocks)
+    for idx, block in enumerate(gfm_reader._parser._tree):
         assert isinstance(block, blocks[idx])
 
 
@@ -167,8 +167,8 @@ def test_para(gfm_reader, mocker, data, blocks):
 @mock_file
 def test_para_inline_content(gfm_reader, mocker, data, type, blocks):
     gfm_reader.read("Foo")
-    assert len(gfm_reader._tree) == 1
-    inline_block = gfm_reader._tree[0].contents.contents[0]
+    assert len(gfm_reader._parser._tree) == 1
+    inline_block = gfm_reader._parser._tree[0].contents.contents[0]
     assert isinstance(inline_block, type)
     assert len(inline_block.contents.contents) == len(blocks)
     for idx, block in enumerate(inline_block.contents.contents):
@@ -194,9 +194,9 @@ def test_para_inline_content(gfm_reader, mocker, data, type, blocks):
 @mock_file
 def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
     gfm_reader.read("Foo")
-    assert len(gfm_reader._tree) == 1
-    assert isinstance(gfm_reader._tree[0], ast.Para)
-    read_blocks = gfm_reader._tree[0].contents.contents
+    assert len(gfm_reader._parser._tree) == 1
+    assert isinstance(gfm_reader._parser._tree[0], ast.Para)
+    read_blocks = gfm_reader._parser._tree[0].contents.contents
     assert read_blocks == atom_blocks
 
 
@@ -211,7 +211,7 @@ def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
 @mock_file
 def test_nested_inlines(gfm_reader, mocker, data, outside_type, nested_type, pos_idx):
     gfm_reader.read("Foo")
-    outside_inline = gfm_reader._tree[0].contents.contents[0]
+    outside_inline = gfm_reader._parser._tree[0].contents.contents[0]
     assert isinstance(outside_inline, outside_type)
     assert isinstance(outside_inline.contents.contents[pos_idx], nested_type)
 
@@ -229,7 +229,7 @@ def test_nested_inlines(gfm_reader, mocker, data, outside_type, nested_type, pos
 @mock_file
 def test_bulletlist(gfm_reader, mocker, data, plain_amt, plain_content_amt):
     gfm_reader.read("Foo")
-    bullet_list = gfm_reader._tree[0].contents.contents
+    bullet_list = gfm_reader._parser._tree[0].contents.contents
     assert len(bullet_list) == plain_amt
     plain_sum = 0
     for plain in bullet_list:
@@ -260,6 +260,6 @@ def test_bulletlist(gfm_reader, mocker, data, plain_amt, plain_content_amt):
 @mock_file
 def test_nested_bullet(gfm_reader, mocker, data, types):
     gfm_reader.read("Foo")
-    bullet_list = gfm_reader._tree[0].contents.contents
+    bullet_list = gfm_reader._parser._tree[0].contents.contents
     for idx, item in enumerate(bullet_list):
         assert item.name == types[idx]

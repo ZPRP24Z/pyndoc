@@ -1,6 +1,6 @@
 import pyndoc.ast.blocks as ast
 import pyndoc.ast.basic_blocks as ast_base
-import pyndoc.readers.gfm.parse_instructions as gfm
+import pyndoc.readers.gfm.blocks as gfm
 
 INLINE = True
 
