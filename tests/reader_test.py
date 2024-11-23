@@ -255,6 +255,10 @@ def test_bulletlist(gfm_reader, mocker, data, plain_amt, plain_content_amt):
             "+ bullet list\n  - nested bullet\n+ old bullet",
             ["Plain", "BulletList", "Plain"],
         ),
+        (
+            "+ bullet\n - nested bullet\n\n+ old bullet",
+            ["Plain", "BulletList", "Plain"],
+        ),
     ],
 )
 @mock_file

@@ -20,7 +20,7 @@ declared_ends = {
     ast.Strong: r"\*\*",
     gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
-    gfm.BulletList: r"non-ending-placeholder",
+    gfm.BulletList: r"\n\n",
     ast_base.ASTCompositeBlock: r"(\n)$",  # DEFAULT
 }
 

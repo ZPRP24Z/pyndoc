@@ -2,7 +2,7 @@ import re
 from typing_extensions import Unpack
 
 import pyndoc.ast.blocks as ast
-import pyndoc.ast.basic_blocks as ast_base
+import pyndoc.ast.helpers as ast_helpers
 
 
 class Space(ast.Space):
@@ -11,7 +11,7 @@ class Space(ast.Space):
 
     @classmethod
     def match_pattern(
-        cls, **kwargs: Unpack[ast_base.AtomMatchParams]
+        cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]
     ) -> re.Match | None:
         context = kwargs["context"]
         if not context or context[-1].name == "BulletList":
@@ -28,7 +28,7 @@ class Header(ast.Header):
     def __init__(self) -> None:
         super().__init__()
 
-    def process_read(self, **kwargs: Unpack[ast_base.ProcessParams]) -> None:
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
         match = kwargs["match"]
         level = len(match.group("h"))
         self.contents.metadata = [level]
@@ -40,7 +40,7 @@ class Emph(ast.Emph):
 
     @classmethod
     def start(
-        cls, **kwargs: Unpack[ast_base.StartParams]
+        cls, **kwargs: Unpack[ast_helpers.StartParams]
     ) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         match = re.search(cls.start_pattern, token)
@@ -56,7 +56,7 @@ class BulletList(ast.BulletList):
     def __init__(self) -> None:
         super().__init__()
 
-    def process_read(self, **kwargs: Unpack[ast_base.ProcessParams]) -> None:
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
         match = kwargs["match"]
         indent = len(match.group("s"))
         self.contents.metadata = [indent]
@@ -69,7 +69,7 @@ class BulletList(ast.BulletList):
 
     @classmethod
     def start(
-        cls, **kwargs: Unpack[ast_base.StartParams]
+        cls, **kwargs: Unpack[ast_helpers.StartParams]
     ) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         context = kwargs["context"]
@@ -92,10 +92,10 @@ class BulletList(ast.BulletList):
         return (match, token)
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_base.EndParams]) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         """
         BulletList end check.
-        if a bullet list with the same indent started, do not end,
+        if a bullet list with the same or larger indent started, do not end,
         otherwise - end
         """
         token = kwargs["token"]
@@ -104,7 +104,7 @@ class BulletList(ast.BulletList):
         if match:
             token_indent = len(match.group("s"))
             block_indent = context[-1].contents.metadata[0]
-            if token_indent == block_indent:
+            if token_indent >= block_indent:
                 return (None, "")
             elif token_indent < block_indent:
                 return (match, token)
