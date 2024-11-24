@@ -22,6 +22,7 @@ declared_ends = {
     ast.Para: r"\n\n",
     gfm.BulletList: r"\n\n",
     ast_base.ASTCompositeBlock: r"(\n)$",  # DEFAULT
+    ast.Code: r"`",
 }
 
 
