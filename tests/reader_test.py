@@ -268,6 +268,7 @@ def test_nested_bullet(gfm_reader, mocker, data, types):
     for idx, item in enumerate(bullet_list):
         assert item.name == types[idx]
 
+
 @pytest.mark.parametrize(
     ("data", "types"),
     [
