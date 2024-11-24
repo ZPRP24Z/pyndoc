@@ -10,5 +10,9 @@ class NativeWriter:
 
         return f"[\n{blocks_str}\n]"
 
-    def print_ast_tree(self, ast_tree: list[ASTBlock]) -> None:
+    def print_tree(self, ast_tree: list[ASTBlock]) -> None:
         print(self._get_native_representation(ast_tree))
+
+    def write_tree_to_file(self, filename: str, ast_tree: list[ASTBlock]) -> None:
+        with open(filename, "w") as fp:
+            fp.write(self._get_native_representation(ast_tree))
