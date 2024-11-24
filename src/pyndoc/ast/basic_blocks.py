@@ -8,6 +8,12 @@ class ASTBlock:
 
     def __init__(self, name: str) -> None:
         self.name = name
+    
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name!r})"
+    
+    def __str__(self) -> str:
+        return f"{self.name}"
 
 
 class ASTAtomBlock(ASTBlock, AtomReadHandler):
@@ -30,8 +36,11 @@ class ASTAtomBlock(ASTBlock, AtomReadHandler):
             return self.name == other.name and self.contents == other.contents
         return NotImplemented
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f'{self.name}("{self.contents}")'
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(name={self.name!r}, contents={self.contents!r})'
 
 
 class ASTCompositeContents:
@@ -77,3 +86,14 @@ class ASTCompositeBlock(ASTBlock, CompositeReadHandler):
         """
         self.contents.contents.append(block)
 
+    def __str__(self) -> str:
+        metadata_str = f"Metadata: {self.contents.metadata}" if self.contents.metadata else "Metadata: None"
+        contents_str = "\n".join(["  " + str(block).replace("\n", "\n  ") for block in self.contents.contents])
+        contents_str = f"Contents:\n{contents_str}" if contents_str else "Contents: None"
+        return f"CompositeBlock: {self.name}\n{metadata_str}\n{contents_str}"
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(name={self.name!r}, "
+            f"metadata={self.contents.metadata!r}, contents={self.contents.contents!r})"
+        )
