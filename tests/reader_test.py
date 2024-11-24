@@ -267,3 +267,19 @@ def test_nested_bullet(gfm_reader, mocker, data, types):
     bullet_list = gfm_reader._parser._tree[0].contents.contents
     for idx, item in enumerate(bullet_list):
         assert item.name == types[idx]
+
+@pytest.mark.parametrize(
+    ("data", "types"),
+    [
+        ("`code`", ["Code"]),
+        ("Some `code`", ["Str", "Space", "Code", "Str"]),
+        ("`code` some", ["Code", "Space", "Str"]),
+        ("`code` some `more code`", ["Code", "Space", "Str", "Space", "Code"]),
+    ],
+)
+@mock_file
+def test_code_inline(gfm_reader, mocker, data, types):
+    gfm_reader.read("Foo")
+    code_blocks = gfm_reader._parser._tree[0].contents.contents
+    for idx, item in enumerate(code_blocks):
+        assert item.name == types[idx]
