@@ -6,8 +6,9 @@ import re
 class CompositeReadHandler:
     """
     Class that is meant as a handler for reading logic for an AST Composite child.
-    methods implemented here are defaults for 
+    methods implemented here are defaults for
     """
+
     start_pattern = ""
     end_pattern = ""
     inline = False
@@ -21,7 +22,9 @@ class CompositeReadHandler:
         pass
 
     @classmethod
-    def start(cls, **kwargs: Unpack[helpers.StartParams]) -> tuple[re.Match | None, str]:
+    def start(
+        cls, **kwargs: Unpack[helpers.StartParams]
+    ) -> tuple[re.Match | None, str]:
         """
         Check if a block has started.
         Returns a match if matched, otherwise None
@@ -88,7 +91,9 @@ class AtomReadHandler:
     has_content = False
 
     @classmethod
-    def match_pattern(cls, **kwargs: Unpack[helpers.AtomMatchParams]) -> re.Match | None:
+    def match_pattern(
+        cls, **kwargs: Unpack[helpers.AtomMatchParams]
+    ) -> re.Match | None:
         """
         Check if the block matches a given token.
         Returns a regex match (or None if match failed)

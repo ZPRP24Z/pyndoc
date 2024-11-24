@@ -18,6 +18,9 @@ class Str(ASTAtomBlock):
     def __init__(self, contents: str = "") -> None:
         super().__init__("Str", contents)
 
+    def __str__(self) -> str:
+        return super().__str__() + f' "{self.contents}"'
+
 
 class SoftBreak(ASTAtomBlock):
     def __init__(self) -> None:
@@ -64,6 +67,7 @@ class Code(ASTCompositeBlock):
     """
     Basic Code AST block
     """
+
     def __init__(self) -> None:
         super().__init__("Code")
 

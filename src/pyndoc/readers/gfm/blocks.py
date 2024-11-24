@@ -92,7 +92,9 @@ class BulletList(ast.BulletList):
         return (match, token)
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+    def end(
+        cls, **kwargs: Unpack[ast_helpers.EndParams]
+    ) -> tuple[re.Match | None, str]:
         """
         BulletList end check.
         if a bullet list with the same or larger indent started, do not end,

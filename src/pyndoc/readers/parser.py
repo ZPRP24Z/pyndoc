@@ -32,9 +32,7 @@ class Parser:
         for atom_block in self._atom_block_types:
             if not atom_block.match_pattern(
                 text=self.token, context=self.context
-            ) and atom_block.match_pattern(
-                text=self.token[:-1], context=self.context
-            ):
+            ) and atom_block.match_pattern(text=self.token[:-1], context=self.context):
                 old_token, self.token = self.token[:-1], self.token[-1:]
                 self._process_atom_block(old_token)
 
@@ -91,9 +89,7 @@ class Parser:
         If so, set the current context as the block
         """
         for block in self._block_types:
-            start_match, new_token = block.start(
-                token=self.token, context=self.context
-            )
+            start_match, new_token = block.start(token=self.token, context=self.context)
             if not start_match:
                 self.token = new_token
                 continue
@@ -117,4 +113,3 @@ class Parser:
     def process_trailing_atom(self) -> None:
         self._process_atom_block(self.token)
         self.token = ""
-
