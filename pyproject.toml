@@ -18,7 +18,7 @@ python = "^3.12"
 black = "^24.10.0"
 
 [tool.poetry.scripts]
-pyndock = "main:main"
+pyndoc = "pyndoc.main:main"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
