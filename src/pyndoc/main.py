@@ -1,6 +1,7 @@
 import argparse
 
-def main():
+
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog='Pyndoc',
         description='Converter of markup languages.')
@@ -12,6 +13,7 @@ def main():
 
     args = parser.parse_args()
     print(args)
+
 
 if __name__ == "__main__":
     main()
