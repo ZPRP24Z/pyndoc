@@ -23,7 +23,6 @@ def main() -> None:
     input_file = args.file
     output_file = args.output
     from_format = args.from_format
-    to_format = args.to_format
     native_action = args.native
 
     try:
