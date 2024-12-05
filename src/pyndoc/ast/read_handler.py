@@ -93,7 +93,7 @@ class AtomReadHandler:
     @classmethod
     def match_pattern(
         cls, **kwargs: Unpack[helpers.AtomMatchParams]
-    ) -> re.Match | None:
+    ) -> tuple[re.Match | None, str]:
         """
         Check if the block matches a given token.
         Returns a regex match (or None if match failed)
@@ -103,8 +103,8 @@ class AtomReadHandler:
         text = kwargs["text"]
         match = re.search(cls.pattern, text)
         if match and len(text) != match.end():
-            return None
-        return match
+            return (None, text)
+        return (match, text)
 
     @classmethod
     def override_match_pattern(cls, pattern: str) -> None:

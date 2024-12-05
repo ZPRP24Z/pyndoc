@@ -47,7 +47,7 @@ def test_simple_type(gfm_reader, block_type, mocker, data):
     ("data", "contents_len"),
     [
         ("# has 5 strings 4 spaces\n", 9),
-        ("# text *italic text here - header has 3 blocks - 1 space 2 str*\n", 3),
+        ("# text *italic text here - header has 3 blocks - 1 space 2 str*", 3),
         (
             "*italic text with 8 strings and 7   corrected-spaces*",
             1,
@@ -57,6 +57,7 @@ def test_simple_type(gfm_reader, block_type, mocker, data):
 @mock_file
 def test_simple_len(gfm_reader, contents_len, mocker, data):
     gfm_reader.read("Foo")
+    print(gfm_reader._parser._tree[0].contents.contents)
     assert len(gfm_reader._parser._tree[0].contents.contents) == contents_len
 
 
@@ -124,6 +125,8 @@ def test_eof_header(gfm_reader, mocker, data, blocks):
         ("para", [ast.Para]),
         ("#incorrectheader", [ast.Para]),
         ("para\npara", [ast.Para]),
+        ("*para*\n\npara", [ast.Para, ast.Para]),
+        ("**para**\n\npara", [ast.Para, ast.Para]),
     ],
 )
 @mock_file

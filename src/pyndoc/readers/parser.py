@@ -29,10 +29,13 @@ class Parser:
         Check if an atom block has ended.
         That is, if matching it with a next character results in None (but previously matched)
         """
+
         for atom_block in self._atom_block_types:
-            if not atom_block.match_pattern(
-                text=self.token, context=self.context
-            ) and atom_block.match_pattern(text=self.token[:-1], context=self.context):
+            print("CHECKING TOKEN: ", self.token)
+            match_cur, self._token = atom_block.match_pattern(text=self.token, context=self.context)
+            match_prev, _ = atom_block.match_pattern(text=self.token[:-1], context=self.context)
+            if not match_cur and match_prev:
+                print("FOUND ATOM BLOCK MATCH! TOKEN: ", self.token, "matched: ", atom_block)
                 old_token, self.token = self.token[:-1], self.token[-1:]
                 self._process_atom_block(old_token)
 
@@ -44,7 +47,7 @@ class Parser:
         atom_block = [
             atom_block
             for atom_block in self._atom_block_types
-            if atom_block.match_pattern(text=token, context=self.context)
+            if atom_block.match_pattern(text=token, context=self.context)[0]
         ]
         if not atom_block:
             return
@@ -68,6 +71,8 @@ class Parser:
             )
         if not end_match:
             return
+
+        print("END FOUND, ", self.context[-1])
 
         # process token before the block-end
         self._process_atom_block(self.token[: end_match.start()])

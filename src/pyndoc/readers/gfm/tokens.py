@@ -33,7 +33,8 @@ atom_wrapper = ast.Para
 declared_atomic_patterns = {
     gfm.Space: (r"^[ ]+$", False),
     ast.Str: (r"^[^\s\n]+$", True),
-    ast.SoftBreak: (r"^\n(?!\n)", False),
+    # ast.SoftBreak: (r"^\n(?!\n)", False),
+    gfm.SoftBreak: (r"^\n", False),
 }
 
 

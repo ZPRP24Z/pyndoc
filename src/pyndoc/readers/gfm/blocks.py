@@ -12,16 +12,34 @@ class Space(ast.Space):
     @classmethod
     def match_pattern(
         cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]
-    ) -> re.Match | None:
+    ) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
-        if not context or context[-1].name == "BulletList":
-            return None
-
         text = kwargs["text"]
+        if not context or context[-1].name == "BulletList":
+            return (None, text)
+
         match = re.search(cls.pattern, text)
         if match and len(text) != match.end():
-            return None
-        return match
+            return (None, text)
+        return (match, text)
+
+
+class SoftBreak(ast.SoftBreak):
+
+    @classmethod
+    def match_pattern(
+        cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]
+    ) -> tuple[re.Match | None, str]:
+        context = kwargs["context"]
+        text = kwargs["text"]
+
+        match = re.search(cls.pattern, text)
+        if match and len(text) != match.end():
+            return (None, text)
+        
+        if match and not context:
+            return (None, '')
+        return (match, text)
 
 
 class Header(ast.Header):
@@ -48,7 +66,15 @@ class Emph(ast.Emph):
         return (match, token)
 
     @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+        match = re.search(cls.end_pattern, token)
+        token = token[match.end() - 1 :] if match else token
+        return (match, token)
+
+    @classmethod
     def handle_premature_closure(cls, token: str) -> str:
+        print("HANDLE PREMATURE CLOSURE CALLED")
         return token[:-1] if token[-1] == "*" else token
 
 
