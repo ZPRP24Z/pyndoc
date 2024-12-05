@@ -10,9 +10,7 @@ class Space(ast.Space):
         super().__init__()
 
     @classmethod
-    def match_pattern(
-        cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]
-    ) -> tuple[re.Match | None, str]:
+    def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
         if not context or context[-1].name == "BulletList":
@@ -27,9 +25,7 @@ class Space(ast.Space):
 class SoftBreak(ast.SoftBreak):
 
     @classmethod
-    def match_pattern(
-        cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]
-    ) -> tuple[re.Match | None, str]:
+    def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
 
@@ -38,7 +34,7 @@ class SoftBreak(ast.SoftBreak):
             return (None, text)
 
         if match and not context:
-            return (match, '')
+            return (match, "")
         return (match, text)
 
 
@@ -57,9 +53,7 @@ class Emph(ast.Emph):
         super().__init__()
 
     @classmethod
-    def start(
-        cls, **kwargs: Unpack[ast_helpers.StartParams]
-    ) -> tuple[re.Match | None, str]:
+    def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         match = re.search(cls.start_pattern, token)
         token = token[-1:] if match else token
@@ -68,8 +62,14 @@ class Emph(ast.Emph):
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
-        match = re.search(cls.end_pattern, token)
-        token = token[match.end() - 1 :] if match else token
+        context = kwargs["context"]
+
+        if context[-2] and context[-2].name == "Strong":
+            match = re.search(cls.end_pattern[:2], token)
+            token = token[match.end() :] if match else token
+        else:
+            match = re.search(cls.end_pattern[:], token)
+            token = token[match.end() - 1 :] if match else token
         return (match, token)
 
     @classmethod
@@ -93,9 +93,7 @@ class BulletList(ast.BulletList):
         context.append(plain)
 
     @classmethod
-    def start(
-        cls, **kwargs: Unpack[ast_helpers.StartParams]
-    ) -> tuple[re.Match | None, str]:
+    def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         context = kwargs["context"]
         match = re.search(cls.start_pattern, token)
@@ -117,9 +115,7 @@ class BulletList(ast.BulletList):
         return (match, token)
 
     @classmethod
-    def end(
-        cls, **kwargs: Unpack[ast_helpers.EndParams]
-    ) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         """
         BulletList end check.
         if a bullet list with the same or larger indent started, do not end,

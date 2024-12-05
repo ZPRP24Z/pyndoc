@@ -208,6 +208,7 @@ def test_para_atom_content(gfm_reader, mocker, data, atom_blocks):
         ("**here is nested *italic* and sth**", ast.Strong, ast.Emph, 6),
         ("**nested *italic***", ast.Strong, ast.Emph, 2),
         ("*inside italic **strong** and sth*", ast.Emph, ast.Strong, 4),
+        ("***nested strong italic***", ast.Strong, ast.Emph, 0),
     ],
 )
 @mock_file

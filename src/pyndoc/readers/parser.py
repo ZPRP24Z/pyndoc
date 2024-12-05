@@ -60,13 +60,9 @@ class Parser:
         check if the current context block has ended
         """
         if len(self.context):
-            end_match, new_token = self.context[-1].end(
-                token=self.token, context=self.context
-            )
+            end_match, new_token = self.context[-1].end(token=self.token, context=self.context)
         else:
-            end_match, new_token = self._atom_wrapper_block.end(
-                token=self.token, context=self.context
-            )
+            end_match, new_token = self._atom_wrapper_block.end(token=self.token, context=self.context)
         if not end_match:
             return
 
