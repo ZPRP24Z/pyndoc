@@ -17,11 +17,12 @@ declared_tokens = {
 
 # How do composite blocks end?
 declared_ends = {
+    gfm.Header: r"\n",
     ast.Strong: r"\*\*",
     gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
     gfm.BulletList: r"\n\n",
-    ast_base.ASTCompositeBlock: r"(\n)$",  # DEFAULT
+    ast_base.ASTCompositeBlock: r"\n",  # DEFAULT
     ast.Code: r"`",
 }
 
@@ -33,7 +34,6 @@ atom_wrapper = ast.Para
 declared_atomic_patterns = {
     gfm.Space: (r"^[ ]+$", False),
     ast.Str: (r"^[^\s\n]+$", True),
-    # ast.SoftBreak: (r"^\n(?!\n)", False),
     gfm.SoftBreak: (r"^\n", False),
 }
 

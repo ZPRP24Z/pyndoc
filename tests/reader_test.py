@@ -57,7 +57,6 @@ def test_simple_type(gfm_reader, block_type, mocker, data):
 @mock_file
 def test_simple_len(gfm_reader, contents_len, mocker, data):
     gfm_reader.read("Foo")
-    print(gfm_reader._parser._tree[0].contents.contents)
     assert len(gfm_reader._parser._tree[0].contents.contents) == contents_len
 
 

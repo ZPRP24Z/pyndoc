@@ -31,11 +31,9 @@ class Parser:
         """
 
         for atom_block in self._atom_block_types:
-            print("CHECKING TOKEN: ", self.token)
-            match_cur, self._token = atom_block.match_pattern(text=self.token, context=self.context)
+            match_cur, self.token = atom_block.match_pattern(text=self.token, context=self.context)
             match_prev, _ = atom_block.match_pattern(text=self.token[:-1], context=self.context)
             if not match_cur and match_prev:
-                print("FOUND ATOM BLOCK MATCH! TOKEN: ", self.token, "matched: ", atom_block)
                 old_token, self.token = self.token[:-1], self.token[-1:]
                 self._process_atom_block(old_token)
 
@@ -71,8 +69,6 @@ class Parser:
             )
         if not end_match:
             return
-
-        print("END FOUND, ", self.context[-1])
 
         # process token before the block-end
         self._process_atom_block(self.token[: end_match.start()])

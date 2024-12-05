@@ -36,9 +36,9 @@ class SoftBreak(ast.SoftBreak):
         match = re.search(cls.pattern, text)
         if match and len(text) != match.end():
             return (None, text)
-        
+
         if match and not context:
-            return (None, '')
+            return (match, '')
         return (match, text)
 
 
@@ -74,7 +74,6 @@ class Emph(ast.Emph):
 
     @classmethod
     def handle_premature_closure(cls, token: str) -> str:
-        print("HANDLE PREMATURE CLOSURE CALLED")
         return token[:-1] if token[-1] == "*" else token
 
 
