@@ -2,18 +2,16 @@ import argparse
 from pyndoc.readers import reader
 from pyndoc.writers.native_writer import NativeWriter
 
+writers_dict = {"native": NativeWriter()}
+
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        prog="Pyndoc", description="Converter of markup languages."
-    )
+    parser = argparse.ArgumentParser(prog="Pyndoc", description="Converter of markup languages.")
 
     parser.add_argument("-f", "--from", dest="from_format", help="Source format")
     parser.add_argument("-t", "--to", dest="to_format", help="Target format")
     parser.add_argument("file", help="Input file")
-    parser.add_argument(
-        "-o", "--output", dest="output", default=None, help="Output file (optional)"
-    )
+    parser.add_argument("-o", "--output", dest="output", default=None, help="Output file (optional)")
 
     args = parser.parse_args()
 
@@ -28,25 +26,20 @@ def main() -> None:
             from_format = file_extension.lstrip(".").lower()
 
         if not from_format:
-            raise ValueError(
-                "Could not determine the source format from the file extension."
-            )
+            raise ValueError("Could not determine the source format from the file extension.")
 
         r = reader.Reader(from_format)
         r.read(input_file)
 
-        if to_format == "native":
-            native = NativeWriter()
-            if output_file:
-                native.write_tree_to_file(output_file, r._parser._tree)
-            else:
-                native.print_tree(r._parser._tree)
-            return
+        ast_tree = r._parser._tree
+        writer = writers_dict[to_format]
 
+        writer.print_tree(ast_tree)
         if output_file:
-            with open(output_file, "w") as file:
-                file.write("\n".join(str(element) for element in r._parser._tree))
+            writer.write_tree_to_file(output_file, ast_tree)
 
+    except KeyError:
+        print(f"Incorrect target format specified: {to_format}")
     except Exception as e:
         print(f"Error: {e}")
 
