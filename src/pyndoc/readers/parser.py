@@ -33,6 +33,7 @@ class Parser:
         for atom_block in self._atom_block_types:
             match_cur, self.token = atom_block.match_pattern(text=self.token, context=self.context)
             match_prev, _ = atom_block.match_pattern(text=self.token[:-1], context=self.context)
+
             if not match_cur and match_prev:
                 old_token, self.token = self.token[:-1], self.token[-1:]
                 self._process_atom_block(old_token)
@@ -73,7 +74,9 @@ class Parser:
         self._end()
 
     def _end(self) -> None:
-        # block is processed, move it to finished tree
+        """
+        Move a processed blocks to the finished tree
+        """
         if len(self.context) > 1:
             item = self.context.pop()
             self.context[-1].insert(item)
@@ -101,6 +104,9 @@ class Parser:
             break
 
     def close_context(self) -> None:
+        """
+        If the file has ended - go through each block in the context and end it
+        """
         while self.context:
             if self.token:
                 self.token = self.context[-1].handle_premature_closure(self.token)
@@ -108,5 +114,8 @@ class Parser:
             self._end()
 
     def process_trailing_atom(self) -> None:
+        """
+        Immediately process an atom block without checking for the usual condition
+        """
         self._process_atom_block(self.token)
         self.token = ""

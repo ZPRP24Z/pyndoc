@@ -14,16 +14,13 @@ def main() -> None:
     parser.add_argument(
         "-o", "--output", dest="output", default=None, help="Output file (optional)"
     )
-    parser.add_argument(
-        "-n", dest="native", choices=["native"], help="Perform native format."
-    )
 
     args = parser.parse_args()
 
     input_file = args.file
     output_file = args.output
     from_format = args.from_format
-    native_action = args.native
+    to_format = args.to_format
 
     try:
         if not from_format:
@@ -38,11 +35,12 @@ def main() -> None:
         r = reader.Reader(from_format)
         r.read(input_file)
 
-        if native_action == "native":
+        if to_format == "native":
             native = NativeWriter()
-            native.print_tree(r._parser._tree)
             if output_file:
                 native.write_tree_to_file(output_file, r._parser._tree)
+            else:
+                native.print_tree(r._parser._tree)
             return
 
         if output_file:
