@@ -40,9 +40,7 @@ class ASTAtomBlock(ASTBlock, AtomReadHandler):
         return f"{self.__class__.__name__}"
 
     def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}(name={self.name!r}, contents={self.contents!r})"
-        )
+        return f"{self.__class__.__name__}(name={self.name!r}, contents={self.contents!r})"
 
 
 class ASTCompositeContents:
@@ -66,9 +64,7 @@ class ASTCompositeBlock(ASTBlock, CompositeReadHandler):
     This block can hold both atom, and other composite blocks inside of it.
     """
 
-    def __init__(
-        self, name: str, metadata: list | None = None, contents: list | None = None
-    ) -> None:
+    def __init__(self, name: str, metadata: list | None = None, contents: list | None = None) -> None:
         """
         Keyword arguments:
             * name -- the name of the block
@@ -95,16 +91,9 @@ class ASTCompositeBlock(ASTBlock, CompositeReadHandler):
             result_str += f"Metadata: {self.contents.metadata}\n  "
 
         contents_str = "\n".join(
-            [
-                "    " + str(block).replace("\n", "\n    ") + ","
-                for block in self.contents.contents
-            ]
+            ["    " + str(block).replace("\n", "\n    ") + "," for block in self.contents.contents]
         )
-        result_str += (
-            f"Contents: \n  [\n{contents_str}\n  ],"
-            if contents_str
-            else "Contents: None"
-        ) + "\n]"
+        result_str += (f"Contents: \n  [\n{contents_str}\n  ]," if contents_str else "Contents: None") + "\n]"
 
         return result_str
 

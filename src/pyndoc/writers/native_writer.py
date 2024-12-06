@@ -4,9 +4,7 @@ from pyndoc.ast.basic_blocks import ASTBlock
 class NativeWriter:
     def _get_native_representation(self, ast_tree: list[ASTBlock]) -> str:
 
-        blocks_str = "\n".join(
-            ["  " + str(block).replace("\n", "\n  ") + "," for block in ast_tree]
-        )
+        blocks_str = "\n".join(["  " + str(block).replace("\n", "\n  ") + "," for block in ast_tree])
 
         return f"[\n{blocks_str}\n]"
 
