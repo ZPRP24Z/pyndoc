@@ -1,6 +1,6 @@
 import argparse
-from src.pyndoc.readers import reader
-from src.pyndoc.writers.native_writer import NativeWriter
+from pyndoc.readers import reader
+from pyndoc.writers.native_writer import NativeWriter
 
 
 def main() -> None:
