@@ -8,7 +8,7 @@ INLINE = True
 declared_tokens = {
     gfm.Header: (r"^(?P<h>#{1,6}) ", not INLINE),
     ast.Strong: (r"\*\*", INLINE),
-    gfm.BulletList: (r"^(?P<s>[\t|\s]*)[\*|\+|\-] ", not INLINE),
+    gfm.BulletList: (r"^(?P<s>[\t\s]*)[\*\+\-] ", not INLINE),
     gfm.Emph: (r"\*[^*]{1}", INLINE),
     ast.Code: (r"`", INLINE),
     # The atom wrapper does not need to be declared here
