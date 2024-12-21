@@ -13,7 +13,7 @@ class Space(ast.Space):
     def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
-        if not context or context[-1].name == "BulletList":
+        if not context or context[-1].name in ("BulletList", "OrderedList"):
             return (None, text)
 
         match = re.search(cls.pattern, text)
@@ -28,6 +28,9 @@ class SoftBreak(ast.SoftBreak):
     def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
+
+        if not context or context[-1].name in ("BulletList", "OrderedList"):
+            return (None, text)
 
         match = re.search(cls.pattern, text)
         if match and len(text) != match.end():
@@ -108,7 +111,7 @@ class BulletList(ast.BulletList):
                     cls.add_plain(context)
                     return (None, "")
             if not context or bigger_indent:
-                token = token[: match.start()] if match else token
+                token = token[: match.start()]
             else:
                 match = None
 
@@ -123,14 +126,13 @@ class BulletList(ast.BulletList):
         """
         token = kwargs["token"]
         context = kwargs["context"]
-        match = re.search(cls.start_pattern, token)
-        if match:
+
+        if len(context) >= 2 and (match := re.search(context[-2].__class__.start_pattern, token)) is not None:
             token_indent = len(match.group("s"))
             block_indent = context[-1].contents.metadata[0]
-            if token_indent >= block_indent:
-                return (None, "")
-            elif token_indent < block_indent:
+            if token_indent < block_indent:
                 return (match, token)
+            return (None, "")
 
         match = re.search(cls.end_pattern, token)
         token = token[match.end() :] if match else token
@@ -175,7 +177,7 @@ class OrderedList(ast.OrderedList):
                     cls.add_plain(context)
                     return (None, "")
             if not context or bigger_indent:
-                token = token[: match.start()] if match else token
+                token = token[: match.start()]
             else:
                 match = None
 
@@ -190,14 +192,13 @@ class OrderedList(ast.OrderedList):
         """
         token = kwargs["token"]
         context = kwargs["context"]
-        match = re.search(cls.start_pattern, token)
-        if match:
+
+        if len(context) >= 2 and (match := re.search(context[-2].__class__.start_pattern, token)) is not None:
             token_indent = len(match.group("s"))
             block_indent = context[-1].contents.metadata[0]
-            if token_indent >= block_indent:
-                return (None, "")
-            elif token_indent < block_indent:
+            if token_indent < block_indent:
                 return (match, token)
+            return (None, "")
 
         match = re.search(cls.end_pattern, token)
         token = token[match.end() :] if match else token
