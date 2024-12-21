@@ -88,7 +88,7 @@ class ASTCompositeBlock(ASTBlock, CompositeReadHandler):
         result_str = f"{self.__class__.__name__}: [\n  "
 
         if self.contents.metadata:
-            result_str += f"Metadata: {self.contents.metadata}\n  "
+            result_str += f"Metadata: {[element.__str__() for element in self.contents.metadata]}\n  "
 
         contents_str = "\n".join(
             ["    " + str(block).replace("\n", "\n    ") + "," for block in self.contents.contents]

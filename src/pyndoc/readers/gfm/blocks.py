@@ -13,7 +13,7 @@ class Space(ast.Space):
     def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
-        if not context or context[-1].name == "BulletList":
+        if not context or context[-1].name in ("BulletList", "OrderedList"):
             return (None, text)
 
         match = re.search(cls.pattern, text)
@@ -28,6 +28,9 @@ class SoftBreak(ast.SoftBreak):
     def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
+
+        if not context or context[-1].name in ("BulletList", "OrderedList"):
+            return (None, text)
 
         match = re.search(cls.pattern, text)
         if match and len(text) != match.end():
@@ -100,7 +103,7 @@ class BulletList(ast.BulletList):
 
         if match:
             bigger_indent = False
-            if context and context[-1].name == "BulletList":
+            if context and context[-1].name in ("BulletList", "OrderedList"):
                 match_indent = len(match.group("s"))
                 context_indent = context[-1].contents.metadata[0]
                 bigger_indent = match_indent > context_indent
@@ -108,7 +111,7 @@ class BulletList(ast.BulletList):
                     cls.add_plain(context)
                     return (None, "")
             if not context or bigger_indent:
-                token = token[: match.start()] if match else token
+                token = token[: match.start()]
             else:
                 match = None
 
@@ -123,14 +126,79 @@ class BulletList(ast.BulletList):
         """
         token = kwargs["token"]
         context = kwargs["context"]
-        match = re.search(cls.start_pattern, token)
-        if match:
+
+        if len(context) >= 2 and (match := re.search(context[-2].__class__.start_pattern, token)) is not None:
             token_indent = len(match.group("s"))
             block_indent = context[-1].contents.metadata[0]
-            if token_indent >= block_indent:
-                return (None, "")
-            elif token_indent < block_indent:
+            if token_indent < block_indent:
                 return (match, token)
+            return (None, "")
+
+        match = re.search(cls.end_pattern, token)
+        token = token[match.end() :] if match else token
+        return (match, token)
+
+
+class OrderedList(ast.OrderedList):
+    separator_dict = {".": ast_helpers.Separator.PERIOD, ")": ast_helpers.Separator.CLOSING_PAREN}
+    numbering_type = ast_helpers.NumberingType.DECIMAL  # gfm supports only decimal numbering type
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        match = kwargs["match"]
+
+        indent = len(match.group("s"))
+        starting_num = int(match.group("num"))
+        separator = self.separator_dict[match.group("sep")]
+
+        self.contents.metadata = [indent, starting_num, OrderedList.numbering_type, separator]
+        self.add_plain(kwargs["context"])
+
+    @staticmethod
+    def add_plain(context: list) -> None:
+        plain = ast.Plain()
+        context.append(plain)
+
+    @classmethod
+    def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+        context = kwargs["context"]
+        match = re.search(cls.start_pattern, token)
+
+        if match:
+            bigger_indent = False
+            if context and context[-1].name in ("BulletList", "OrderedList"):
+                context_indent = context[-1].contents.metadata[0]
+                match_indent = len(match.group("s"))
+                bigger_indent = match_indent > context_indent
+                if match_indent == context_indent:
+                    cls.add_plain(context)
+                    return (None, "")
+            if not context or bigger_indent:
+                token = token[: match.start()]
+            else:
+                match = None
+
+        return (match, token)
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        """
+        OrderedList end check.
+        if an ordered list with the same or larger indent started, do not end,
+        otherwise - end
+        """
+        token = kwargs["token"]
+        context = kwargs["context"]
+
+        if len(context) >= 2 and (match := re.search(context[-2].__class__.start_pattern, token)) is not None:
+            token_indent = len(match.group("s"))
+            block_indent = context[-1].contents.metadata[0]
+            if token_indent < block_indent:
+                return (match, token)
+            return (None, "")
 
         match = re.search(cls.end_pattern, token)
         token = token[match.end() :] if match else token

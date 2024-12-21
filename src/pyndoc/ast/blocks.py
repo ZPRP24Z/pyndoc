@@ -77,6 +77,28 @@ class BulletList(ASTCompositeBlock):
         super().__init__("BulletList")
 
 
+class OrderedList(ASTCompositeBlock):
+    """
+    Ordered List AST block
+    Metadata is a 4 element list:
+        - index 0:
+            - type: int
+            - meaning: indentation value
+        - index 1:
+            - type: int
+            - meaning: starting number of ordered list
+        - index 2:
+            - type: NumberingType(Enum)
+            - meaning: numbering type (DECIMAL, ALPHABETIC, ROMAN_NUMERALS)
+        - index 3:
+            - type: Separator(Enum)
+            - meaning: separator after number (PERIOD , CLOSING_PAREN)
+    """
+
+    def __init__(self) -> None:
+        super().__init__("OrderedList")
+
+
 class Plain(ASTCompositeBlock):
     def __init__(self) -> None:
         super().__init__("Plain")
