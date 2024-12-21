@@ -1,6 +1,12 @@
 import pytest
 from pyndoc.ast.blocks import BulletList, OrderedList
-from tests.reader_test import mock_file, gfm_reader
+from pyndoc.readers.reader import Reader
+from tests.reader_test import mock_file
+
+
+@pytest.fixture
+def gfm_reader():
+    return Reader("gfm")
 
 
 @pytest.mark.parametrize(
