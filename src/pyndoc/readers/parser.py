@@ -1,4 +1,5 @@
 import importlib
+from pyndoc.ast.ast_tree import ASTTree
 
 
 class Parser:
@@ -13,7 +14,7 @@ class Parser:
     """
 
     def __init__(self, lang: str) -> None:
-        self._tree = []
+        self._tree = ASTTree([])
         self.context = []
         self.token = ""
 
