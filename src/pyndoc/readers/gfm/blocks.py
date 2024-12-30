@@ -100,11 +100,7 @@ class _GFMList(ABC):
 
         if match:
             bigger_indent = False
-            print(cls.start_pattern + "matched")
-            print(token)
             if context and issubclass(context[-1].__class__, _GFMList):
-                print(context[-1])
-                print("is subclass")
                 match_indent = len(match.group("s"))
                 context_indent = context[-1].contents.metadata[0]
                 bigger_indent = match_indent > context_indent
