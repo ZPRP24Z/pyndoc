@@ -32,4 +32,4 @@ pipx install -e .
 
 ## Documentation
 
-Currently, the project uses the Github Wiki for storing documentation, see the [Home](https://github.com/ZPRP24Z/pyndoc/wiki) page for details. In later stages of development, there are plans to switch to Github Pages.
+Project documentation is available [here](https://pyndoc.readthedocs.io/en/latest/index.html).
