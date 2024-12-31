@@ -8,7 +8,8 @@ INLINE = True
 declared_tokens = {
     gfm.Header: (r"^(?P<h>#{1,6}) ", not INLINE),
     ast.Strong: (r"\*\*", INLINE),
-    gfm.BulletList: (r"^(?P<s>[\t|\s]*)[\*|\+|\-] ", not INLINE),
+    gfm.BulletList: (r"^(?P<s>[\t\s]*)[\*\+\-] ", not INLINE),
+    gfm.OrderedList: (r"^(?P<s>[\t\s]*)(?P<num>\d{1,9})(?P<sep>[\.|)]) ", not INLINE),
     gfm.Emph: (r"\*[^*]{1}", INLINE),
     ast.Code: (r"`", INLINE),
     # The atom wrapper does not need to be declared here
@@ -22,6 +23,7 @@ declared_ends = {
     gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
     gfm.BulletList: r"\n\n",
+    gfm.OrderedList: r"\n\n",
     ast_base.ASTCompositeBlock: r"\n",  # DEFAULT
     ast.Code: r"`",
 }
