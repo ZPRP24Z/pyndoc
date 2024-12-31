@@ -10,11 +10,14 @@ build:
   tools:
     python: "3.13"
   jobs:
-    post_install:
+    pre_install:
       - pip install poetry
       - pip install poetry-plugin-export
       - poetry install --without dev,test --sync
       - poetry --without-hashes export --format=requirements.txt > docs/requirements.txt
+    pre_build:
+      - poetry build
+      - pip install -e .
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
