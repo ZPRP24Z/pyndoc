@@ -2,8 +2,7 @@ from pyndoc.ast.basic_blocks import ASTAtomBlock, ASTCompositeBlock
 
 
 class Space(ASTAtomBlock):
-    """
-    AST Atom block representing whitespace
+    """AST Atom block representing whitespace
     """
 
     def __init__(self) -> None:
@@ -11,8 +10,7 @@ class Space(ASTAtomBlock):
 
 
 class Str(ASTAtomBlock):
-    """
-    special AST block representing string without whitespace characters
+    """special AST block representing string without whitespace characters
     """
 
     def __init__(self, contents: str = "") -> None:
@@ -28,8 +26,7 @@ class SoftBreak(ASTAtomBlock):
 
 
 class Header(ASTCompositeBlock):
-    """
-    AST block representing a heading
+    """AST block representing a heading
     """
 
     def __init__(self) -> None:
@@ -37,8 +34,7 @@ class Header(ASTCompositeBlock):
 
 
 class Para(ASTCompositeBlock):
-    """
-    AST block representing a paragraph.
+    """AST block representing a paragraph.
     """
 
     def __init__(self) -> None:
@@ -46,8 +42,7 @@ class Para(ASTCompositeBlock):
 
 
 class Emph(ASTCompositeBlock):
-    """
-    Basic Italic AST block
+    """Basic Italic AST block
     """
 
     def __init__(self) -> None:
@@ -55,8 +50,7 @@ class Emph(ASTCompositeBlock):
 
 
 class Strong(ASTCompositeBlock):
-    """
-    Basic Bold AST block
+    """Basic Bold AST block
     """
 
     def __init__(self) -> None:
@@ -64,8 +58,7 @@ class Strong(ASTCompositeBlock):
 
 
 class Code(ASTCompositeBlock):
-    """
-    Basic Code AST block
+    """Basic Code AST block
     """
 
     def __init__(self) -> None:
@@ -78,21 +71,7 @@ class BulletList(ASTCompositeBlock):
 
 
 class OrderedList(ASTCompositeBlock):
-    """
-    Ordered List AST block
-    Metadata is a 4 element list:
-        - index 0:
-            - type: int
-            - meaning: indentation value
-        - index 1:
-            - type: int
-            - meaning: starting number of ordered list
-        - index 2:
-            - type: NumberingType(Enum)
-            - meaning: numbering type (DECIMAL, ALPHABETIC, ROMAN_NUMERALS)
-        - index 3:
-            - type: Separator(Enum)
-            - meaning: separator after number (PERIOD , CLOSING_PAREN)
+    """Ordered List AST block
     """
 
     def __init__(self) -> None:

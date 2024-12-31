@@ -6,10 +6,12 @@ class Reader:
         self._parser = Parser(lang)
 
     def process(self, char: str) -> None:
-        """
-        Process a current token
+        """Process a current token
         taking into consideration the current context tree, check if
         a new block has started or ended, process atom blocks
+        
+        :param char: The currently processed character
+        :type char: ``str``
         """
         self._parser.token += char
         self._parser.check_end()
@@ -17,8 +19,7 @@ class Reader:
         self._parser.check_atom_block()
 
     def read(self, filename: str) -> None:
-        """
-        Open and read a file one character at a time,
+        """Open and read a file one character at a time,
         then pass the character to tokenizer
         """
         with open(filename, "r") as fp:

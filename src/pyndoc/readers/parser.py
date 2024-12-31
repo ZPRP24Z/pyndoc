@@ -3,31 +3,26 @@ from pyndoc.ast.ast_tree import ASTTree
 
 
 class Parser:
-    """
-    Class representing a general reader for all input languages
-    Fields:
-        * tree - representing the tree into which the blocks will be processed
-        * context - stack-like representation of currently processed blocks
-        * token - currently processed token
-        * block_types - types of composite blocks found in a given language
-        * atom_block_types - atom blocks found in a give language
+    """Class representing a general reader for all input languages
+    :param lang:
+        The reader's language
+    :type lang: ``str``
     """
 
     def __init__(self, lang: str) -> None:
-        self._tree = ASTTree([])
-        self.context = []
-        self.token = ""
+        self._tree = ASTTree([])  #: The current AST Tree (blocks already read)
+        self.context = []  #: The context stack
+        self.token = ""  #: Token currently matched
 
         lang_module = importlib.import_module(f"pyndoc.readers.{lang}.tokens")
-        self._block_types = lang_module.declared_tokens.keys()
-        self._atom_block_types = lang_module.declared_atomic_patterns.keys()
-        self._atom_wrapper_block = lang_module.atom_wrapper
+        self._block_types = lang_module.declared_tokens.keys()  #: Types of available composite blocks (declared by lang)
+        self._atom_block_types = lang_module.declared_atomic_patterns.keys()  #: Atom block types (declared by lang)
+        self._atom_wrapper_block = lang_module.atom_wrapper  #: The block in which atom blocks will be wrapped if no context is found
 
         lang_module.assign_patterns()
 
     def check_atom_block(self) -> None:
-        """
-        Check if an atom block has ended.
+        """Check if an atom block has ended.
         That is, if matching it with a next character results in None (but previously matched)
         """
 
@@ -40,8 +35,10 @@ class Parser:
                 self._process_atom_block(old_token)
 
     def _process_atom_block(self, token: str) -> None:
-        """
-        process an atom block (Str, Space etc.)
+        """process an atom block (Str, Space etc.)
+        :param token:
+            The token to be processed
+        :type token: ``str``
         """
 
         atom_block = [
@@ -58,8 +55,7 @@ class Parser:
         self.context[-1].insert(atom_block[0](*args))
 
     def check_end(self) -> None:
-        """
-        check if the current context block has ended
+        """check if the current context block has ended
         """
         if len(self.context):
             end_match, new_token = self.context[-1].end(token=self.token, context=self.context)
@@ -75,8 +71,7 @@ class Parser:
         self._end()
 
     def _end(self) -> None:
-        """
-        Move a processed blocks to the finished tree
+        """Move a processed blocks to the finished tree
         """
         if len(self.context) > 1:
             item = self.context.pop()
@@ -85,8 +80,7 @@ class Parser:
             self._tree.append(self.context.pop())
 
     def check_start(self) -> None:
-        """
-        Check if a new block has just started.
+        """Check if a new block has just started.
         If so, set the current context as the block
         """
         for block in self._block_types:

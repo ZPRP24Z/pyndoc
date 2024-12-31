@@ -63,3 +63,4 @@ line-ending = "auto"
 
 [lint.per-file-ignores]
 "tests/*" = ["ANN"]
+"docs/*" = ["ALL"]

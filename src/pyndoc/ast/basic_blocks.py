@@ -2,8 +2,7 @@ from pyndoc.ast.read_handler import CompositeReadHandler, AtomReadHandler
 
 
 class ASTBlock:
-    """
-    Definition of a base AST block containing just a name
+    """Definition of a base AST block containing just a name
     """
 
     def __init__(self, name: str) -> None:
@@ -17,16 +16,19 @@ class ASTBlock:
 
 
 class ASTAtomBlock(ASTBlock, AtomReadHandler):
-    """
-    Definition of an AST Atom Block.
+    """Definition of an AST Atom Block.
     An AST Atom block is a block that cannot hold any other blocks inside of it.
+
+    :param name:
+        The name of the block
+    :type name: ``str``
+    :param contents:
+        the contents of the Atom Block, empty by default
+    :type contents: ``str``, optional
     """
 
     def __init__(self, name: str, contents: str = "") -> None:
-        """
-        Keyword arguments:
-            * name - the name of the block
-            * contents - the block's contents if it has any
+        """Constructor method
         """
         self.contents = contents
         super().__init__(name)
@@ -44,43 +46,41 @@ class ASTAtomBlock(ASTBlock, AtomReadHandler):
 
 
 class ASTCompositeContents:
-    """
-    The representation of a composite block's contents
+    """The representation of a composite block's contents
+
+    :param metadata: The block's special metadata
+    :type metadata: ``list``
+    :param contents: The contents of the class
+    :type contents: ``list[ASTBlock]``
     """
 
     def __init__(self, metadata: list, contents: list[ASTBlock]) -> None:
-        """
-        Keyword arguments:
-            * metadata -- block's metadata (level for headers, etc.)
-            * contents -- a list of other AST blocks
-        """
         self.metadata = metadata
         self.contents = contents
 
 
 class ASTCompositeBlock(ASTBlock, CompositeReadHandler):
-    """
-    The definition of an AST Composite block.
+    """The definition of an AST Composite block.
     This block can hold both atom, and other composite blocks inside of it.
+
+    :param name: The name of the block
+    :type name: ``str``
+    :param metadata: List of block's metadata
+    :type metadata: ``list | None``
+    :param contents: A list of other ASTBlocks representing the block's contents, defaults to a None object
+    :type contents: ``list | None``
     """
 
     def __init__(self, name: str, metadata: list | None = None, contents: list | None = None) -> None:
-        """
-        Keyword arguments:
-            * name -- the name of the block
-            * metadata -- list of block's metadata
-            * contents -- a list of other ASTBlocks representing the block's content
-        """
         metadata = metadata if metadata else []
         contents = contents if contents else []
         self.contents = ASTCompositeContents(metadata, contents)
         super().__init__(name)
 
     def insert(self, block: ASTBlock) -> None:
-        """
-        Insert another AST Block into this one
-        Keyword arguments:
-            * block -- the other block object
+        """Insert another AST Block into this one
+        :param block: the other block object
+        :type block: ASTBlock
         """
         self.contents.contents.append(block)
 
