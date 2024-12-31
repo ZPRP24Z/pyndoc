@@ -11,7 +11,7 @@ build:
     python: "3.13"
   jobs:
     pre_install:
-      - pipx install poetry
+      - pip install poetry
       - poetry install --group docs
 
 
