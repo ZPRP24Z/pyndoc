@@ -2,8 +2,9 @@ import argparse
 from pyndoc.readers import reader
 from pyndoc.writers.native_writer import NativeWriter
 from pyndoc.writers.latex_writer import LatexWriter
+from pyndoc.writers.typst_writer import TypstWriter
 
-writers_dict = {"native": NativeWriter(), "latex": LatexWriter()}
+writers_dict = {"native": NativeWriter(), "latex": LatexWriter(), "typst": TypstWriter()}
 
 
 def main() -> None:
