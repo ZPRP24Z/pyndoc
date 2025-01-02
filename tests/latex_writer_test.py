@@ -1,6 +1,12 @@
 import pytest
-from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList
+import functools
+from pyndoc.readers.reader import Reader
 from pyndoc.writers.latex_writer import LatexWriter
+
+
+@pytest.fixture
+def gfm_reader():
+    return Reader("gfm")
 
 
 @pytest.fixture
@@ -8,92 +14,117 @@ def latex_writer():
     return LatexWriter()
 
 
-@pytest.mark.parametrize(
-    ("ast_tree", "expected_output"),
-    [
-        ([Str("Hello")], "\\documentclass{article}\n\\begin{document}\nHello\\end{document}"),
-        (
-            [Para(contents=[Str("Hello"), Space(), Str("world!")])],
-            "\\documentclass{article}\n\\begin{document}\nHello world!\n\n\\end{document}",
-        ),
-        (
-            [Header(contents=[Str("Header")], metadata=[1])],
-            "\\documentclass{article}\n\\begin{document}\n\\section{Header}\\end{document}",
-        ),
-    ],
-)
-def test_get_latex_representation(latex_writer, ast_tree, expected_output):
-    assert latex_writer._get_latex_representation(ast_tree) == expected_output
+def mock_file(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        mocker = kwargs.get("mocker")
+        data = kwargs.get("data")
+
+        # Mockowanie otwarcia pliku
+        mocked_data = mocker.mock_open(read_data=data)
+        mocker.patch("builtins.open", mocked_data)
+
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 @pytest.mark.parametrize(
-    ("block", "expected_output"),
+    ("data", "expected_latex"),
     [
-        (Str("Hello"), "Hello"),
-        (Space(), " "),
-        (SoftBreak(), "\n"),
-        (Emph(contents=[Str("emphasized")]), "\\emph{emphasized}"),
-        (Strong(contents=[Str("bold")]), "\\textbf{bold}"),
-        (Code(contents=[Str("code")]), "\\texttt{code}"),
         (
-            Para(contents=[Str("This"), Space(), Str("is"), Space(), Str("a"), Space(), Str("paragraph.")]),
-            "This is a paragraph.\n\n",
+            "# Header 1\nThis is a paragraph.",
+            "\\documentclass{article}\n\\begin{document}\n\\section{Header 1}\nThis is a paragraph.\n\n\\end{document}",
         ),
         (
-            Header(contents=[Str("Header")], metadata=[1]),
-            "\\section{Header}",
-        ),
-        (
-            BulletList(
-                contents=[
-                    Para(contents=[Str("Item 1")]),
-                    Para(contents=[Str("Item 2")]),
-                ]
-            ),
-            "\\begin{itemize}\n\\item Item 1\n\\item Item 2\n\\end{itemize}",
+            "- Item 1\n- Item 2",
+            "\\documentclass{article}\n\\begin{document}\n\\begin{itemize}\n\\item Item 1\n\\item Item 2\n\\end{itemize}\n\\end{document}",
         ),
     ],
 )
-def test_process_block(latex_writer, block, expected_output):
-    assert latex_writer._process_block(block) == expected_output
+@mock_file
+def test_markdown_to_latex(gfm_reader, latex_writer, mocker, data, expected_latex):
+    filename = "test.md"
+
+    gfm_reader.read(filename)
+
+    ast_tree = gfm_reader._parser._tree
+
+    generated_latex = latex_writer._get_latex_representation(ast_tree)
+    assert generated_latex.strip() == expected_latex.strip()
 
 
 @pytest.mark.parametrize(
-    ("contents", "expected_output"),
+    ("data", "expected_latex"),
     [
-        ([Str("Text"), Space(), Str("more text")], "Text more text"),
         (
-            [
-                Emph(contents=[Str("italic")]),
-                Space(),
-                Strong(contents=[Str("bold")]),
-            ],
-            "\\emph{italic} \\textbf{bold}",
+            "# Header 1",
+            "\\documentclass{article}\n\\begin{document}\n\\section{Header 1}\n\\end{document}",
+        ),
+        (
+            "## Header 2",
+            "\\documentclass{article}\n\\begin{document}\n\\subsection{Header 2}\n\\end{document}",
+        ),
+        (
+            "### Header 3",
+            "\\documentclass{article}\n\\begin{document}\n\\subsubsection{Header 3}\n\\end{document}",
+        ),
+        (
+            "#### Header 4",
+            "\\documentclass{article}\n\\begin{document}\n\\paragraph{Header 4}\n\\end{document}",
+        ),
+        (
+            "##### Header 5",
+            "\\documentclass{article}\n\\begin{document}\n\\subparagraph{Header 5}\n\\end{document}",
         ),
     ],
 )
-def test_process_contents(latex_writer, contents, expected_output):
-    assert latex_writer._process_contents(contents) == expected_output
+@mock_file
+def test_headers_to_latex(gfm_reader, latex_writer, mocker, data, expected_latex):
+    filename = "test_headers.md"
+
+    gfm_reader.read(filename)
+
+    ast_tree = gfm_reader._parser._tree
+
+    generated_latex = latex_writer._get_latex_representation(ast_tree)
+
+    assert generated_latex.strip() == expected_latex.strip()
 
 
 @pytest.mark.parametrize(
-    ("ast_tree", "expected_output"),
+    ("data", "expected_latex"),
     [
         (
-            [
-                Para(contents=[Str("Paragraph"), Space(), Str("one")]),
-                Para(contents=[Str("Paragraph"), Space(), Str("two")]),
-            ],
-            "\\documentclass{article}\n\\begin{document}\nParagraph one\n\nParagraph two\n\n\\end{document}",
+            "*italic text*",
+            "\\documentclass{article}\n\\begin{document}\n\\emph{italic text}\n\n\\end{document}",
         ),
         (
-            [
-                Header(contents=[Str("Header")], metadata=[1]),
-                Para(contents=[Str("Body"), Space(), Str("text")]),
-            ],
-            "\\documentclass{article}\n\\begin{document}\n\\section{Header}\nBody text\n\n\\end{document}",
+            "**bold text**",
+            "\\documentclass{article}\n\\begin{document}\n\\textbf{bold text}\n\n\\end{document}",
+        ),
+        (
+            "*italic text* followed by **bold text**",
+            "\\documentclass{article}\n\\begin{document}\n\\emph{italic text} followed by \\textbf{bold text}\n\n\\end{document}",
+        ),
+        (
+            "**bold text with *italic inside***",
+            "\\documentclass{article}\n\\begin{document}\n\\textbf{bold text with \\emph{italic inside}}\n\n\\end{document}",
+        ),
+        (
+            "Normal text with *italic*, **bold**, and **bold *italic***",
+            "\\documentclass{article}\n\\begin{document}\nNormal text with \\emph{italic}, \\textbf{bold}, and \\textbf{bold \\emph{italic}}\n\n\\end{document}",
         ),
     ],
 )
-def test_complex_ast_tree(latex_writer, ast_tree, expected_output):
-    assert latex_writer._get_latex_representation(ast_tree) == expected_output
+@mock_file
+def test_emphasis_and_bold_to_latex(gfm_reader, latex_writer, mocker, data, expected_latex):
+    filename = "test_emphasis.md"
+
+    gfm_reader.read(filename)
+
+    ast_tree = gfm_reader._parser._tree
+
+    generated_latex = latex_writer._get_latex_representation(ast_tree)
+
+    assert generated_latex.strip() == expected_latex.strip()
