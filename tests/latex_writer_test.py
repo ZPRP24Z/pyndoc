@@ -128,3 +128,29 @@ def test_emphasis_and_bold_to_latex(gfm_reader, latex_writer, mocker, data, expe
     generated_latex = latex_writer._get_latex_representation(ast_tree)
 
     assert generated_latex.strip() == expected_latex.strip()
+
+
+@pytest.mark.parametrize(
+    ("data", "expected_latex"),
+    [
+        (
+            "# Header 1\nThis is a paragraph.",
+            "\\documentclass{article}\n\\begin{document}\n\\section{Header 1}\nThis is a paragraph.\n\n\\end{document}",
+        ),
+        (
+            "## Header 2\nThis is a paragraph.\n\n- Item 1\n- *Item 2*",
+            "\\documentclass{article}\n\\begin{document}\n\\subsection{Header 2}\nThis is a paragraph.\n\n\\begin{itemize}\n\\item Item 1\n\\item \\emph{Item 2}\n\\end{itemize}\n\\end{document}",
+        ),
+    ],
+)
+@mock_file
+def test_mixed_latex(gfm_reader, latex_writer, mocker, data, expected_latex):
+    filename = "test_mixed.md"
+
+    gfm_reader.read(filename)
+
+    ast_tree = gfm_reader._parser._tree
+
+    generated_latex = latex_writer._get_latex_representation(ast_tree)
+
+    assert generated_latex.strip() == expected_latex.strip()
