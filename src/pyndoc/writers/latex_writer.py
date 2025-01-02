@@ -19,7 +19,7 @@ class LatexWriter:
     def _get_latex_representation(self, ast_tree: list[ASTBlock]) -> str:
         result = "\\documentclass{article}\n\\begin{document}\n"
         result += "\n".join(self._process_block(block) for block in ast_tree)
-        result += "\\end{document}"
+        result += "\n\\end{document}"
         return result
 
     def _process_block(self, block: ASTBlock) -> str:
@@ -27,7 +27,7 @@ class LatexWriter:
         return handler(block)
 
     def _process_para(self, block: Para) -> str:
-        return f"{self._process_contents(block.contents.contents)}\n\n"
+        return f"{self._process_contents(block.contents.contents)}\n"
 
     def _process_emph(self, block: Emph) -> str:
         return f"\\emph{{{self._process_contents(block.contents.contents)}}}"
@@ -40,7 +40,8 @@ class LatexWriter:
 
     def _process_header(self, block: Header) -> str:
         level = block.contents.metadata[0] if block.contents.metadata else 1
-        command = "section" if level == 1 else "subsection"
+        commands = {1: "section", 2: "subsection", 3: "subsubsection", 4: "paragraph", 5: "subparagraph"}
+        command = commands.get(level, "paragraph")
         return f"\\{command}{{{self._process_contents(block.contents.contents)}}}"
 
     def _process_bullet_list(self, block: BulletList) -> str:
