@@ -4,6 +4,7 @@ from pyndoc.ast.ast_tree import ASTTree
 
 class Parser:
     """Class representing a general reader for all input languages
+
     :param lang:
         The reader's language
     :type lang: ``str``
@@ -36,6 +37,7 @@ class Parser:
 
     def _process_atom_block(self, token: str) -> None:
         """process an atom block (Str, Space etc.)
+
         :param token:
             The token to be processed
         :type token: ``str``
