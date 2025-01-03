@@ -6,7 +6,7 @@
 Pyndoc documentation
 ====================
 
-*Pyndoc* is markup language conversion tool made as an alternative to [Pandoc](https://github.com/jgm/pandoc/) written entirely in `Python`.
+*Pyndoc* is markup language conversion tool made as an alternative to `Pandoc <https://github.com/jgm/pandoc/>`__ written entirely in `Python`.
 
 This documentation contains usage and development instructions
 
