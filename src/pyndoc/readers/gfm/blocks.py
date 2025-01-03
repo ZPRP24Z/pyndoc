@@ -163,3 +163,8 @@ class OrderedList(_GFMList, ast.OrderedList):
 
         self.contents.metadata = [indent, starting_num, OrderedList.numbering_type, separator]
         self.add_plain(kwargs["context"])
+
+
+class Table(ast.Table):
+    def __init__(self) -> None:
+        super().__init__()
