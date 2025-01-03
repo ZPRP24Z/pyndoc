@@ -9,7 +9,7 @@
 
 The primary goal of the project is to make the CLI easily extensible in terms of new formats.
 
-For development use see [development instructions](https://github.com/ZPRP24Z/pyndoc/wiki/Development-Instructions)
+For development use see [development instructions](https://pyndoc.readthedocs.io/en/latest/development-instructions.html)
 
 ## Getting Started
 
