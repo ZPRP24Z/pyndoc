@@ -27,6 +27,7 @@ declared_ends = {
     gfm.OrderedList: r"\n\n",
     ast_base.ASTCompositeBlock: r"\n",  # DEFAULT
     ast.Code: r"`",
+    gfm.Table: r"\n\n",
 }
 
 
