@@ -1,6 +1,8 @@
 AST (pyndoc.ast package)
 ========================
 
+This package contains the definitions related to the Pyndoc Abstract Syntax Tree, including blocks, helpers, and read handlers
+
 Submodules
 ----------
 
@@ -15,6 +17,8 @@ pyndoc.ast.ast\_tree module
 pyndoc.ast.basic\_blocks module
 -------------------------------
 
+Basic AST blocks that are used as a base for more complex AST Blocks
+
 .. automodule:: pyndoc.ast.basic_blocks
    :members:
    :undoc-members:
@@ -22,6 +26,8 @@ pyndoc.ast.basic\_blocks module
 
 pyndoc.ast.blocks module
 ------------------------
+
+Defualt block definitions
 
 .. automodule:: pyndoc.ast.blocks
    :members:
@@ -38,6 +44,8 @@ pyndoc.ast.helpers module
 
 pyndoc.ast.read\_handler module
 -------------------------------
+
+Read handlers, that define class attributes for read patterns for certain blocks
 
 .. automodule:: pyndoc.ast.read_handler
    :members:

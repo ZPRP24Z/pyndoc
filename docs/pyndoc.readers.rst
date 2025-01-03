@@ -1,6 +1,8 @@
 pyndoc.readers package
 ======================
 
+This package contains classes and functions related to the Pyndoc general reader and parser, as well as Subpackages containing definitions of language-specific AST block handling for custom readers (see Subpackages below)
+
 Subpackages
 -----------
 

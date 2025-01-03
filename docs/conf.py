@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Pyndoc'
-copyright = '2024, Bartosz Nowak, Michał Pałasz, Łukasz Suchołbiak'
+copyright = '2025, Bartosz Nowak, Michał Pałasz, Łukasz Suchołbiak'
 author = 'Bartosz Nowak, Michał Pałasz, Łukasz Suchołbiak'
 release = '0.5.0'
 
@@ -18,6 +18,8 @@ extensions = ["sphinx.ext.todo", "sphinx.ext.viewcode", "sphinx.ext.autodoc"]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+autodoc_member_order = 'bysource'
 
 
 

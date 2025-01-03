@@ -6,13 +6,15 @@
 Pyndoc documentation
 ====================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+*Pyndoc* is markup language conversion tool made as an alternative to [Pandoc](https://github.com/jgm/pandoc/) written entirely in `Python`.
 
+This documentation contains usage and development instructions
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    modules
+   ast
+   new-readers
+   development-instructions
