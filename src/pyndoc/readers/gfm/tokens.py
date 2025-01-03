@@ -12,6 +12,7 @@ declared_tokens = {
     gfm.OrderedList: (r"^(?P<s>[\t\s]*)(?P<num>\d{1,9})(?P<sep>[\.|)]) ", not INLINE),
     gfm.Emph: (r"\*[^*]{1}", INLINE),
     ast.Code: (r"`", INLINE),
+    gfm.Table: (r"^(?P<thead>\|?.*?(\|.*?)*\|?)\n(?P<tsep>\|? *:?-+:? *(\| *:?-+:? *)*\|?)\n", not INLINE),
     # The atom wrapper does not need to be declared here
 }
 
