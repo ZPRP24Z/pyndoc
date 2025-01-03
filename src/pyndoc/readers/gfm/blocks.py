@@ -168,3 +168,22 @@ class OrderedList(_GFMList, ast.OrderedList):
 class Table(ast.Table):
     def __init__(self) -> None:
         super().__init__()
+
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        match = kwargs["match"]
+        thead = match.group("thead")
+        tsep = match.group("tsep")
+        return
+
+    @classmethod
+    def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+
+        match = re.search(cls.start_pattern, token)
+        token = "" if match else token
+
+        return (match, token)
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        pass
