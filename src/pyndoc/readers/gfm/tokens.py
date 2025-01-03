@@ -6,7 +6,7 @@ INLINE = True
 
 # How do composite blocks start?
 declared_tokens = {
-    gfm.Header: (r"^(?P<h>#{1,6}) ", not INLINE),
+    gfm.Header: (r"^(?:\n)*(?P<h>#{1,6}) ", not INLINE),
     ast.Strong: (r"\*\*", INLINE),
     gfm.BulletList: (r"^(?P<s>[\t\s]*)[\*\+\-] ", not INLINE),
     gfm.OrderedList: (r"^(?P<s>[\t\s]*)(?P<num>\d{1,9})(?P<sep>[\.|)]) ", not INLINE),

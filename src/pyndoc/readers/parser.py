@@ -16,9 +16,13 @@ class Parser:
         self.token = ""  #: Token currently matched
 
         lang_module = importlib.import_module(f"pyndoc.readers.{lang}.tokens")
-        self._block_types = lang_module.declared_tokens.keys()  #: Types of available composite blocks (declared by lang)
+        self._block_types = (
+            lang_module.declared_tokens.keys()
+        )  #: Types of available composite blocks (declared by lang)
         self._atom_block_types = lang_module.declared_atomic_patterns.keys()  #: Atom block types (declared by lang)
-        self._atom_wrapper_block = lang_module.atom_wrapper  #: The block in which atom blocks will be wrapped if no context is found
+        self._atom_wrapper_block = (
+            lang_module.atom_wrapper
+        )  #: The block in which atom blocks will be wrapped if no context is found
 
         lang_module.assign_patterns()
 
@@ -57,8 +61,7 @@ class Parser:
         self.context[-1].insert(atom_block[0](*args))
 
     def check_end(self) -> None:
-        """check if the current context block has ended
-        """
+        """check if the current context block has ended"""
         if len(self.context):
             end_match, new_token = self.context[-1].end(token=self.token, context=self.context)
         else:
@@ -73,12 +76,11 @@ class Parser:
         self._end()
 
     def _end(self) -> None:
-        """Move a processed blocks to the finished tree
-        """
+        """Move a processed blocks to the finished tree"""
         if len(self.context) > 1:
             item = self.context.pop()
             self.context[-1].insert(item)
-        else:
+        elif self.context:
             self._tree.append(self.context.pop())
 
     def check_start(self) -> None:
