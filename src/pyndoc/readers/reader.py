@@ -9,7 +9,7 @@ class Reader:
         """Process a current token
         taking into consideration the current context tree, check if
         a new block has started or ended, process atom blocks
-        
+
         :param char: The currently processed character
         :type char: ``str``
         """
