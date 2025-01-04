@@ -1,3 +1,4 @@
+from __future__ import annotations
 import re
 from typing_extensions import Unpack
 from abc import ABC
@@ -169,10 +170,28 @@ class Table(ast.Table):
     def __init__(self) -> None:
         super().__init__()
 
+    @staticmethod
+    def add_table_head(context: list) -> None:
+        table_head = TableHead()
+        context.append(table_head)
+
+    @staticmethod
+    def add_row(context: list) -> None:
+        row = Row()
+        context.append(row)
+
+    @staticmethod
+    def add_cell(context: list) -> None:
+        # needed to start first cell in table
+        cell = Cell()
+        context.append(cell)
+
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
-        match = kwargs["match"]
-        thead = match.group("thead")
-        tsep = match.group("tsep")
+        # wywola sie przy znalezieniu startu
+        context = kwargs.get("context")
+        self.add_table_head(context)
+        self.add_row(context)
+        self.add_cell(context)
         return
 
     @classmethod
@@ -187,3 +206,61 @@ class Table(ast.Table):
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         pass
+
+
+class TableHead(ast.TableHead):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        pass
+
+
+class Row(ast.Row):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @classmethod
+    def create_row(cls) -> Row:
+        pass
+
+
+class Cell(ast.Cell):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @classmethod
+    def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        # TODO make it work - for now just concept
+        # cell from its regex (due to its easy to meet contition) starts only within
+        # existing table(and its components)
+        token = kwargs["token"]
+        context = kwargs["context"]
+
+        if not context or context[-1].name not in ("TableHead", "TableBody", "Row"):
+            # then ignore
+            return (None, token)
+
+        if context[-1].name in ("TableHead", "TableBody"):
+            # if -1 is TableHead or TableBody, -2 is Table
+            # previous row has ended, add new empty row
+            context[-2].add_row(context)
+            pass
+
+        match = re.search(cls.start_pattern, token)
+        if not match or match.span() == (0, 0):
+            return (None, token)
+
+        # if there is anything more than just "| ", then return that, if not -> empty str is returned
+        return (match, token[match.end("c") :])
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+        match = re.search(cls.end_pattern, token)
+
+        if match:
+            token = token[token.end() - 1 :] if token[match.end() - 1] == "\n" else token[match.end() :]
+
+        return (match, token)
