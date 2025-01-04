@@ -199,13 +199,18 @@ class Table(ast.Table):
         token = kwargs["token"]
 
         match = re.search(cls.start_pattern, token)
-        token = "" if match else token
+        token = token[match.end() :] if match else token
 
         return (match, token)
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
-        pass
+        token = kwargs["token"]
+
+        match = re.search(cls.end_pattern, token)
+        token = token[match.end() :] if match else token
+
+        return (match, token)
 
 
 class TableHead(ast.TableHead):
@@ -214,16 +219,32 @@ class TableHead(ast.TableHead):
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        context = kwargs.get("context")
+        token = kwargs.get("token")
+
+        if len(context.contents.contents) != 2:
+            return (None, token)
+
+        match = re.search(cls.end_pattern, token)
+        token = token[match.end() :] if match else token
+
+        return (match, token)
+
+
+class TableBody(ast.TableBody):
+    def __init__(self) -> None:
+        super().__init__()
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        context = kwargs.get("context")
+        token = kwargs.get("token")
         pass
 
 
 class Row(ast.Row):
     def __init__(self) -> None:
         super().__init__()
-
-    @classmethod
-    def create_row(cls) -> Row:
-        pass
 
 
 class Cell(ast.Cell):
@@ -246,7 +267,6 @@ class Cell(ast.Cell):
             # if -1 is TableHead or TableBody, -2 is Table
             # previous row has ended, add new empty row
             context[-2].add_row(context)
-            pass
 
         match = re.search(cls.start_pattern, token)
         if not match or match.span() == (0, 0):
