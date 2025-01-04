@@ -176,6 +176,11 @@ class Table(ast.Table):
         context.append(table_head)
 
     @staticmethod
+    def add_table_body(context: list) -> None:
+        table_body = TableBody()
+        context.append(table_body)
+
+    @staticmethod
     def add_row(context: list) -> None:
         row = Row()
         context.append(row)
@@ -190,6 +195,7 @@ class Table(ast.Table):
         # wywola sie przy znalezieniu startu
         context = kwargs.get("context")
         self.add_table_head(context)
+        print("adding row from process read")
         self.add_row(context)
         self.add_cell(context)
         return
@@ -197,6 +203,10 @@ class Table(ast.Table):
     @classmethod
     def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
+        context = kwargs["context"]
+
+        if context and context[-1].name in ("Table", "TableHead", "TableBody", "Row", "Cell"):
+            return (None, token)
 
         match = re.search(cls.start_pattern, token)
         token = token[match.end() :] if match else token
@@ -222,8 +232,11 @@ class TableHead(ast.TableHead):
         context = kwargs.get("context")
         token = kwargs.get("token")
 
-        if len(context.contents.contents) != 2:
+        print(context)
+        if len(context[0].contents.contents) != 2:
             return (None, token)
+
+        print(context)
 
         match = re.search(cls.end_pattern, token)
         token = token[match.end() :] if match else token
@@ -237,14 +250,27 @@ class TableBody(ast.TableBody):
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
-        context = kwargs.get("context")
         token = kwargs.get("token")
-        pass
+
+        match = re.search(cls.end_pattern, token)
+        token = token[match.start() :] if match else token  # leaving \n\n so that the table ends as well
+
+        return (match, token)
 
 
 class Row(ast.Row):
     def __init__(self) -> None:
         super().__init__()
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        context = kwargs.get("context")
+        token = kwargs.get("token")
+
+        match = re.search(cls.end_pattern, token)
+        token = token[match.start() :] if match else token  # leaving \n so that the table head ends as well
+
+        return (match, token)
 
 
 class Cell(ast.Cell):
@@ -263,14 +289,18 @@ class Cell(ast.Cell):
             # then ignore
             return (None, token)
 
+        match = re.search(cls.start_pattern, token)
+
+        if not match or match.span() != (0, 0):
+            return (None, token)
+
         if context[-1].name in ("TableHead", "TableBody"):
             # if -1 is TableHead or TableBody, -2 is Table
             # previous row has ended, add new empty row
+            print(f"adding row from cell token: '{token}'")
             context[-2].add_row(context)
-
-        match = re.search(cls.start_pattern, token)
-        if not match or match.span() == (0, 0):
-            return (None, token)
+        elif context[-1].name == "Table":
+            context[-1].add_table_body(context)
 
         # if there is anything more than just "| ", then return that, if not -> empty str is returned
         return (match, token[match.end("c") :])
@@ -279,8 +309,9 @@ class Cell(ast.Cell):
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         match = re.search(cls.end_pattern, token)
-
         if match:
+            print(f"got {token}")
             token = token[match.end() - 1 :] if token[match.end() - 1] == "\n" else token[match.end() :]
+            print(f"returning{token}")
 
         return (match, token)
