@@ -261,6 +261,6 @@ class Cell(ast.Cell):
         match = re.search(cls.end_pattern, token)
 
         if match:
-            token = token[token.end() - 1 :] if token[match.end() - 1] == "\n" else token[match.end() :]
+            token = token[match.end() - 1 :] if token[match.end() - 1] == "\n" else token[match.end() :]
 
         return (match, token)
