@@ -304,7 +304,26 @@ class Cell(ast.Cell):
 
     @classmethod
     def get_delimiter_cell_alignment(cls, cell: Cell) -> ast_helpers.Alignment:
-        pass
+        """Returns the alignment of delimiter cell. To be used with cell that passed is_delimiter_cell method
+
+        :param cell: cell being checked
+        :type cell: Cell
+        :return: cell alignment
+        :rtype: Alignment
+        """
+
+        def _is_not_empty(span: tuple[int, int]) -> bool:
+            return span[0] != span[1]
+
+        match = re.match(cls.delimiter_regex, cell.contents.contents[0].contents)
+
+        alignment_map = {
+            (True, True): ast_helpers.Alignment.ALIGN_CENTER,
+            (True, False): ast_helpers.Alignment.ALIGN_LEFT,
+            (False, True): ast_helpers.Alignment.ALIGN_RIGHT,
+            (False, False): ast_helpers.Alignment.ALIGN_DEFAULT,
+        }
+        return alignment_map[(_is_not_empty(match.span("l")), _is_not_empty(match.span("r")))]
 
     @classmethod
     def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
