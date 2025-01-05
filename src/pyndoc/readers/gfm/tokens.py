@@ -13,7 +13,7 @@ declared_tokens = {
     gfm.Emph: (r"\*[^*]{1}", INLINE),
     ast.Code: (r"`", INLINE),
     gfm.Table: (r"^\|", not INLINE),
-    gfm.Cell: (r"^(?P<c>\|? *)[^\n]+", not INLINE),
+    gfm.Cell: (r"^(?P<c> *\| *)[^\n]+", not INLINE),
     # The atom wrapper does not need to be declared here
 }
 
@@ -28,11 +28,11 @@ declared_ends = {
     gfm.OrderedList: r"\n\n",
     ast_base.ASTCompositeBlock: r"\n",  # DEFAULT
     ast.Code: r"`",
-    gfm.Table: r"\n",
-    gfm.Row: r"\n",
+    gfm.Table: r"^[^\|]",
+    gfm.Row: r"\|\n",
     gfm.Cell: r" *\|",
-    gfm.TableHead: r"\n",
-    gfm.TableBody: r"\n\n",
+    gfm.TableHead: r"\n?",
+    gfm.TableBody: r"\n?",
 }
 
 
