@@ -191,10 +191,8 @@ class Table(ast.Table):
         cell = Cell()
         context.append(cell)
 
-    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
-        """"""
-        tb = Table()
-        sep_row = Row()
+    def validate_table(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        pass
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
         # wywola sie przy znalezieniu startu
@@ -258,15 +256,15 @@ class TableBody(ast.TableBody):
 
 
 class Row(ast.Row):
-    delimiter_regex = r"(?P<l>:?)-+(?P<l>:?)"
-
     def __init__(self) -> None:
         super().__init__()
 
     @classmethod
-    def is_delimiter_row(cls, row: Row) -> None:
-        # for cell in row.contents.contents:
-        pass
+    def is_delimiter_row(cls, row: Row) -> bool:
+        for cell in row.contents.contents:
+            if not all([isinstance(cell, Cell), Cell.is_delimiter_cell(cell)]):
+                return False
+        return True
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
