@@ -19,6 +19,7 @@ sphinx-rtd-theme = "^3.0.2"
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
 ruff = "^0.7.3"
+debugpy = "^1.8.11"
 
 
 [tool.poetry.group.docs.dependencies]
