@@ -1,6 +1,7 @@
 import re
 
 from enum import Enum
+from collections import UserList
 from typing import TypedDict
 
 
@@ -39,3 +40,18 @@ class Separator(Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Alignment(Enum):
+    ALIGN_DEFAULT = 1
+    ALIGN_CENTER = 2
+    ALIGN_LEFT = 3
+    ALIGN_RIGHT = 4
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class AlignmentList(UserList):
+    def __str__(self) -> str:
+        return "[" + ", ".join(str(item) for item in self.data) + "]"
