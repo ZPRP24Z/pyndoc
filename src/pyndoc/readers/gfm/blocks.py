@@ -187,15 +187,25 @@ class Table(ast.Table):
 
     @staticmethod
     def add_cell(context: list) -> None:
-        # needed to start first cell in table
         cell = Cell()
         context.append(cell)
 
-    def validate_table(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
-        pass
+    def handle_table_head_end(self, context: list) -> bool:
+        # called when table head ends
+        table = context[-2]
+        thead = context[-1]
+        delimiter_row = thead.contents.contents[1]
+        row_contents = delimiter_row.contents.contents
+
+        if not Row.is_delimiter_row(delimiter_row):
+            raise NotImplementedError
+
+        column_count = len(row_contents)
+        alignment = ast_helpers.AlignmentList([Cell.get_delimiter_cell_alignment(cell) for cell in row_contents])
+
+        table.contents.metadata = [column_count, alignment]
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
-        # wywola sie przy znalezieniu startu
         context = kwargs.get("context")
         self.add_table_head(context)
         self.add_row(context)
@@ -236,6 +246,9 @@ class TableHead(ast.TableHead):
             return (None, token)
 
         match = re.search(cls.end_pattern, token)
+        if match:
+            context[-2].handle_table_head_end(context)
+
         token = token[match.end() :] if match else token
 
         return (match, token)
@@ -261,6 +274,13 @@ class Row(ast.Row):
 
     @classmethod
     def is_delimiter_row(cls, row: Row) -> bool:
+        """Determines whether a row is delimiter row
+
+        :param row: row being checked
+        :type row: Row
+        return: true if row is delimiter row, otherwise false
+        :rtype: bool
+        """
         for cell in row.contents.contents:
             if not all([isinstance(cell, Cell), Cell.is_delimiter_cell(cell)]):
                 return False
@@ -290,7 +310,7 @@ class Cell(ast.Cell):
 
         :param cell: cell being checked
         :type cell: Cell
-        :return: true if passed cell is delimiter cell
+        :return: true if passed cell is delimiter cell, otherwise false
         :rtype: bool
         """
         contents = cell.contents.contents
@@ -324,6 +344,15 @@ class Cell(ast.Cell):
         return alignment_map[(_is_not_empty(match.span("l")), _is_not_empty(match.span("r")))]
 
     @classmethod
+    def _delete_trailing_spaces(cls, context: list) -> None:
+        contents = context[-1].contents.contents
+        if not isinstance(context[-1], cls) or len(contents) == 1:
+            return
+
+        contents = contents[1:] if len(contents) > 1 and isinstance(contents[0], ast.Space) else contents
+        context[-1].contents.contents = contents
+
+    @classmethod
     def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         # cell from its regex (due to its easy to meet contition) starts only within
         # existing table(and its components)
@@ -346,7 +375,10 @@ class Cell(ast.Cell):
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
+        context = kwargs["context"]
+
         match = re.search(cls.end_pattern, token)
         token = token[match.end() - 1 :] if match else token
+        cls._delete_trailing_spaces(context)
 
         return (match, token)

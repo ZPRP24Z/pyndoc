@@ -1,6 +1,7 @@
 import re
 
 from enum import Enum
+from collections import UserList
 from typing import TypedDict
 
 
@@ -49,3 +50,8 @@ class Alignment(Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class AlignmentList(UserList):
+    def __str__(self) -> str:
+        return "[" + ", ".join(str(item) for item in self.data) + "]"
