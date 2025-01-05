@@ -1,7 +1,8 @@
 # Pyndoc - An alternative to Pandoc written in python
 
 ![GitHub License](https://img.shields.io/github/license/ZPRP24Z/pyndoc)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ZPRP24Z/pyndoc/format_test.yml?label=tests)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ZPRP24Z/pyndoc/format.yml?label=formatting)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ZPRP24Z/pyndoc/test.yml?label=tests)
 ![Readthedocs build status](https://readthedocs.org/projects/pyndoc/badge/?version=latest&style=flat)
 
 
