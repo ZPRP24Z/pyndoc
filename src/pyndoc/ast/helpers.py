@@ -39,3 +39,13 @@ class Separator(Enum):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Alignment(Enum):
+    ALIGN_DEFAULT = 1
+    ALIGN_CENTER = 2
+    ALIGN_LEFT = 3
+    ALIGN_RIGHT = 4
+
+    def __str__(self) -> str:
+        return self.name

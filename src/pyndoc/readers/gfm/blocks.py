@@ -192,6 +192,11 @@ class Table(ast.Table):
         context.append(cell)
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        """"""
+        tb = Table()
+        sep_row = Row()
+
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
         # wywola sie przy znalezieniu startu
         context = kwargs.get("context")
         self.add_table_head(context)
@@ -253,8 +258,15 @@ class TableBody(ast.TableBody):
 
 
 class Row(ast.Row):
+    delimiter_regex = r"(?P<l>:?)-+(?P<l>:?)"
+
     def __init__(self) -> None:
         super().__init__()
+
+    @classmethod
+    def is_delimiter_row(cls, row: Row) -> None:
+        # for cell in row.contents.contents:
+        pass
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
@@ -267,8 +279,32 @@ class Row(ast.Row):
 
 
 class Cell(ast.Cell):
+    delimiter_regex = r"(?P<l>:?)-+(?P<r>:?)"
+
     def __init__(self) -> None:
         super().__init__()
+
+    @classmethod
+    def is_delimiter_cell(cls, cell: Cell) -> bool:
+        """Determines whether a cell is delimiter cell - has only one element
+        that is a string and its content is in format matches regular expression (?P<l>:?)-+(?P<l>:?)
+        e.g.: "-", ":----", "--:", ":---:"
+
+        :param cell: cell being checked
+        :type cell: Cell
+        :return: true if passed cell is delimiter cell
+        :rtype: bool
+        """
+        contents = cell.contents.contents
+
+        if len(contents) == 1 and isinstance(contents[0], ast.Str):
+            return re.match(cls.delimiter_regex, contents[0].contents) is not None
+
+        return False
+
+    @classmethod
+    def get_delimiter_cell_alignment(cls, cell: Cell) -> ast_helpers.Alignment:
+        pass
 
     @classmethod
     def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
