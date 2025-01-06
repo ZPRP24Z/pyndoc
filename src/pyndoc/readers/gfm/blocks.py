@@ -3,7 +3,9 @@ import re
 from typing_extensions import Unpack
 from abc import ABC
 
+import pyndoc.ast.basic_blocks as ast_base
 import pyndoc.ast.blocks as ast
+from pyndoc.ast.read_handler import CompositeReadHandler
 import pyndoc.ast.helpers as ast_helpers
 
 
@@ -82,7 +84,7 @@ class Emph(ast.Emph):
         return token[:-1] if token[-1] == "*" else token
 
 
-class _GFMList(ABC):
+class _GFMList(ABC, CompositeReadHandler):
     """
     Base class for gfm lists e.g. bullet list or ordered list
     Class made to avoid code repetition, it should not be used on its own
@@ -297,3 +299,22 @@ class Cell(ast.Cell):
         token = token[match.end() - 1 :] if match else token
 
         return (match, token)
+
+
+class CodeBlockHelper(ast_base.ASTCompositeBlock):
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        match = kwargs["match"]
+        self.contents.metadata.append(match.group("lang"))
+        self.contents.contents.append(ast.CodeBlock())
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+        context = kwargs["context"]
+        match = re.search(cls.end_pattern, token)
+        if not match:
+            context[0].contents.contents += token
+            token = ""
+            return (match, token)
+        return match, token
+

@@ -108,3 +108,11 @@ class Cell(ASTCompositeBlock):
 
     def __init__(self) -> None:
         super().__init__("Cell")
+
+
+class CodeBlock(ASTAtomBlock):
+    """Code block AST block"""
+    
+    def __init__(self) -> None:
+        super().__init__("CodeBlock")
+

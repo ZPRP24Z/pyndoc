@@ -101,6 +101,7 @@ class CompositeReadHandler:
 
 class AtomReadHandler:
     pattern = ""
+    start_pattern = ""
     has_content = False
 
     @classmethod
