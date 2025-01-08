@@ -284,7 +284,7 @@ class Row(ast.Row):
         :rtype: bool
         """
         for cell in row.contents.contents:
-            if not all([isinstance(cell, Cell), Cell.is_delimiter_cell(cell)]):
+            if not isinstance(cell, Cell) or not Cell.is_delimiter_cell(cell):
                 return False
         return True
 
@@ -335,7 +335,13 @@ class Cell(ast.Cell):
         def _is_not_empty(span: tuple[int, int]) -> bool:
             return span[0] != span[1]
 
+        if not cls.is_delimiter_cell(cell) or not isinstance(cell.contents.contents[0], ast.Str):
+            raise ValueError("The cell provided as delimiter cell is not a delimiter cell")
+
         match = re.match(cls.delimiter_regex, cell.contents.contents[0].contents)
+
+        if not match:
+            raise ValueError("The cell provided didnt match delimiter cell regex")
 
         alignment_map = {
             (True, True): ast_helpers.Alignment.ALIGN_CENTER,

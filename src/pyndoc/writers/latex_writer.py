@@ -1,5 +1,5 @@
 from pyndoc.ast.basic_blocks import ASTBlock
-from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList
+from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList, Plain
 
 
 class LatexWriter:
@@ -46,7 +46,9 @@ class LatexWriter:
 
     def _process_bullet_list(self, block: BulletList) -> str:
         items = "\n".join(
-            f"\\item {self._process_contents(item.contents.contents)}" for item in block.contents.contents
+            f"\\item {self._process_contents(item.contents.contents)}"
+            for item in block.contents.contents
+            if isinstance(item, (BulletList, Plain))
         )
         return f"\\begin{{itemize}}\n{items}\n\\end{{itemize}}"
 
