@@ -443,10 +443,17 @@ class Cell(ast.Cell):
 
 
 class CodeBlockHelper(ast_base.ASTCompositeBlock):
+    """A composite helper for parsing ``CodeBlocks``
+    This block will create a ``CodeBlock`` in its contents, parse its metadata and adjust contents.
+    When the block ends, it will replace itself with the ``CodeBlock`` in the context stack.
+    """
+
     def __init__(self) -> None:
         super().__init__("CodeBlockHelper (Dev)")
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        """Parse a ``CodeBlock`` metadata and add an empty ``CodeBlock`` to the block's contents"""
+
         match = kwargs["match"]
         self.contents.contents.append(ast.CodeBlock())
         if isinstance(self.contents.contents[0], ast.CodeBlock):
@@ -454,6 +461,10 @@ class CodeBlockHelper(ast_base.ASTCompositeBlock):
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        """Add ANY token to the ``CodeBlock``,
+        then check if the end of the block matches ``CodeBlock`` end pattern
+        """
+
         token = kwargs["token"]
         context = kwargs["context"]
         code_block = context[-1].contents.contents[0]
@@ -471,10 +482,19 @@ class CodeBlockHelper(ast_base.ASTCompositeBlock):
 
 
 class CodeHelper(ast_base.ASTCompositeBlock):
+    """A Helper for parsing inline code
+    This block will create a ``Code`` in its contents, parse its metadata and adjust contents.
+    When the block ends, it will replace itself with the ``Code`` in the context stack.
+    """
+
     def __init__(self) -> None:
         super().__init__("CodeHelper (Dev)")
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        """Set the end pattern of the block based on the start pattern.
+        Then add an empty ``Code`` block to the contents
+        """
+
         match = kwargs["match"]
         if match:
             self.override_end(match.group()[:-1])
@@ -492,18 +512,18 @@ class CodeHelper(ast_base.ASTCompositeBlock):
     
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        """Add ANY token to the ``Code``,
+        then check if the end of the block matches ``Code`` end pattern
+        """
         token = kwargs["token"]
         context = kwargs["context"]
         code = context[-1].contents.contents[0]
 
-        print(f"token: {token}")
         code.contents += token
         token = ""
 
         end_len = len(cls.end_pattern)
         search_string = code.contents[-end_len:]
-        print(f"code block contents: {code.contents}")
-        print(f"search string: [{search_string}], end pattern: [{cls.end_pattern}]")
         match = re.search(cls.end_pattern, search_string)
         if not match:
             return (match, token)
