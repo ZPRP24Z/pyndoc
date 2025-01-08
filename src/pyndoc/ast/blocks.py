@@ -51,7 +51,7 @@ class Strong(ASTCompositeBlock):
         super().__init__("Strong")
 
 
-class Code(ASTCompositeBlock):
+class Code(ASTAtomBlock):
     """Basic Code AST block"""
 
     def __init__(self) -> None:
