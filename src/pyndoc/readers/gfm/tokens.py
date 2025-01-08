@@ -18,7 +18,6 @@ declared_tokens = {
     # The atom wrapper does not need to be declared here
 }
 
-
 # How do composite blocks end?
 declared_ends = {
     gfm.Header: r"\n",
@@ -36,15 +35,22 @@ declared_ends = {
     gfm.TableBody: r"\n",
 }
 
-
 # what block to use if an atom block is found without context? (not within other blocks)
 atom_wrapper = ast.Para
 
 # how should we define atomic patterns? (blocks not containing other blocks)
 declared_atomic_patterns = {
-    gfm.Space: (r"^[ ]+$", False),
-    ast.Str: (r"^[^\s\n]+$", True),
-    gfm.SoftBreak: (r"^\n", False),
+    gfm.Space: r"^[ ]+$",
+    ast.Str: r"^[^\s\n]+$",
+    gfm.SoftBreak: r"^\n",
+}
+
+atoms_content = {
+    gfm.Space: False,
+    ast.Str: True,
+    gfm.SoftBreak: False,
+    ast.Code: True,
+    ast.CodeBlock: True,
 }
 
 
@@ -62,7 +68,7 @@ def assign_patterns() -> None:
             block.override_inline(True)
 
     for block in atomic_patterns_dict.keys():
-        block.override_match_pattern(atomic_patterns_dict[block][0])
+        block.override_match_pattern(atomic_patterns_dict[block])
 
     for block in atomic_patterns_dict.keys():
-        block.override_has_content(atomic_patterns_dict[block][1])
+        block.override_has_content(atoms_content[block])

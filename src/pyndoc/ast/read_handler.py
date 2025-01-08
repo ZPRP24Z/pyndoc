@@ -103,7 +103,7 @@ class CompositeReadHandler:
 class AtomReadHandler:
     pattern = ""
     start_pattern = ""
-    has_content = False
+    has_content = True
 
     @classmethod
     def match_pattern(cls, **kwargs: Unpack[helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:

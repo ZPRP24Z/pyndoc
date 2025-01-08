@@ -14,9 +14,6 @@ class Str(ASTAtomBlock):
     def __init__(self, contents: str = "") -> None:
         super().__init__(contents)
 
-    def __str__(self) -> str:
-        return super().__str__() + f' "{self.contents}"'
-
 
 class SoftBreak(ASTAtomBlock):
     def __init__(self) -> None:

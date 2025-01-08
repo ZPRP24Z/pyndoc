@@ -32,7 +32,7 @@ class ASTAtomBlock(ASTBlock, AtomReadHandler):
         return NotImplemented
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}"
+        return self.__class__.__name__ + (f"({self.contents!r})" if self.__class__.has_content else "")
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(contents={self.contents!r})"
