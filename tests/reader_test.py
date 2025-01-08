@@ -15,9 +15,10 @@ def mock_file(func):
         mocker = kwargs.get("mocker")
 
         data = kwargs.get("data")
-        mocked_data = mocker.mock_open(read_data=data)
-        builtin_open = "builtins.open"
-        mocker.patch(builtin_open, mocked_data)
+        if mocker:
+            mocked_data = mocker.mock_open(read_data=data)
+            builtin_open = "builtins.open"
+            mocker.patch(builtin_open, mocked_data)
 
         return func(*args, **kwargs)
 
@@ -236,7 +237,7 @@ def test_bulletlist(gfm_reader, mocker, data, plain_amt, plain_content_amt):
     assert len(bullet_list) == plain_amt
     plain_sum = 0
     for plain in bullet_list:
-        assert plain.name == "Plain"
+        assert plain.__class__.__name__ == "Plain"
         plain_sum += len(plain.contents.contents)
 
     assert plain_sum == plain_content_amt
@@ -269,7 +270,7 @@ def test_nested_bullet(gfm_reader, mocker, data, types):
     gfm_reader.read("Foo")
     bullet_list = gfm_reader._parser._tree[0].contents.contents
     for idx, item in enumerate(bullet_list):
-        assert item.name == types[idx]
+        assert item.__class__.__name__ == types[idx]
 
 
 @pytest.mark.parametrize(
@@ -286,4 +287,52 @@ def test_code_inline(gfm_reader, mocker, data, types):
     gfm_reader.read("Foo")
     code_blocks = gfm_reader._parser._tree[0].contents.contents
     for idx, item in enumerate(code_blocks):
-        assert item.name == types[idx]
+        assert item.__class__.__name__ == types[idx]
+
+
+@pytest.mark.parametrize(
+    ("data", "type"),
+    [
+        ("```python\nabc\n```", ast.CodeBlock),
+        ("```md\n*italic text*\n```", ast.CodeBlock),
+        ("```md\n- list element 1\n- list element 2\n```", ast.CodeBlock)
+    ]
+)
+@mock_file
+def test_codeblock(gfm_reader, mocker, data, type):
+    gfm_reader.read("Foo")
+    code_block = gfm_reader._parser._tree[0]
+    assert isinstance(code_block, ast.CodeBlock)
+
+
+@pytest.mark.parametrize(
+    ("data", "contents"),
+    [
+        ("```python\nabc\n```", "abc"),
+        ("```md\n*italic text*\n```", "*italic text*"),
+        ("```md\n- list element 1\n- list element 2\n```", "- list element 1\n- list element 2"),
+        ("```md\n`inline code`\n```", "`inline code`")
+    ]
+)
+@mock_file
+def test_codeblock_contents(gfm_reader, mocker, data, contents):
+    gfm_reader.read("Foo")
+    code_block = gfm_reader._parser._tree[0]
+    assert code_block.contents == contents
+
+
+@pytest.mark.parametrize(
+    ("data", "contents"),
+    [
+        ("`abc`", "abc"),
+        ("`*italic text*`", "*italic text*"),
+        ("``*italic text*``", "*italic text*"),
+        ("``in `line` code``", "in `line` code"),
+    ]
+)
+@mock_file
+def test_code_contents(gfm_reader, mocker, data, contents):
+    gfm_reader.read("Foo")
+    code_block = gfm_reader._parser._tree[0].contents.contents[0]
+    print(code_block)
+    assert code_block.contents == contents

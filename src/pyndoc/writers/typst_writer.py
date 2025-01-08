@@ -22,11 +22,11 @@ class TypstWriter:
         return result
 
     def _process_block(self, block: ASTBlock) -> str:
-        handler = self.block_handlers.get(block.name, self._process_unknown)
+        handler = self.block_handlers.get(block.__class__.__name__, self._process_unknown)
         try:
             return handler(block)
         except Exception as e:
-            return f"// Error processing block {block.name}: {str(e)}"
+            return f"// Error processing block {block.__class__.__name__}: {str(e)}"
 
     def _process_para(self, block: Para) -> str:
         return f"{self._process_contents(block.contents.contents)}\n\n"
@@ -64,7 +64,7 @@ class TypstWriter:
         return "\n"
 
     def _process_unknown(self, block: ASTBlock) -> str:
-        return f"// Unknown block: {block.name}"
+        return f"// Unknown block: {block.__class__.__name__}"
 
     def _process_contents(self, contents: list[ASTBlock]) -> str:
         try:

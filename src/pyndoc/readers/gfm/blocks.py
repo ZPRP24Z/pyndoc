@@ -17,7 +17,7 @@ class Space(ast.Space):
     def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
-        if not context or context[-1].name in ("BulletList", "OrderedList"):
+        if not context or context[-1].__class__.__name__ in ("BulletList", "OrderedList"):
             return (None, text)
 
         match = re.search(cls.pattern, text)
@@ -33,7 +33,7 @@ class SoftBreak(ast.SoftBreak):
         context = kwargs["context"]
         text = kwargs["text"]
 
-        if not context or context[-1].name in ("BulletList", "OrderedList"):
+        if not context or context[-1].__class__.__name__ in ("BulletList", "OrderedList"):
             return (None, text)
 
         match = re.search(cls.pattern, text)
@@ -71,7 +71,7 @@ class Emph(ast.Emph):
         token = kwargs["token"]
         context = kwargs["context"]
 
-        if context[-2] and context[-2].name == "Strong":
+        if context[-2] and context[-2].__class__.__name__ == "Strong":
             match = re.search(cls.end_pattern[:2], token)
             token = token[match.end() :] if match else token
         else:
@@ -240,7 +240,7 @@ class Table(ast.Table):
         token = kwargs["token"]
         context = kwargs["context"]
 
-        if context and context[-1].name in ("Table", "TableHead", "TableBody", "Row", "Cell"):
+        if context and context[-1].__class__.__name__ in ("Table", "TableHead", "TableBody", "Row", "Cell"):
             return (None, token)
 
         match = re.search(cls.start_pattern, token)
@@ -249,7 +249,7 @@ class Table(ast.Table):
         return (match, token)
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         match = re.search(cls.end_pattern, token)
 
@@ -273,7 +273,7 @@ class TableHead(ast.TableHead):
         Row.format_row(thead.contents.contents[0], alignment, row_size)
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         context = kwargs.get("context")
         token = kwargs.get("token")
         if len(context[-1].contents.contents) != 2:
@@ -300,7 +300,7 @@ class TableBody(ast.TableBody):
             row = Row.format_row(row, alignment, row_size)
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         token = kwargs.get("token")
 
         match = re.search(cls.end_pattern, token)
@@ -339,7 +339,7 @@ class Row(ast.Row):
         return True
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         token = kwargs.get("token")
 
         match = re.search(cls.end_pattern, token)
@@ -418,10 +418,10 @@ class Cell(ast.Cell):
         context = kwargs["context"]
 
         match = re.search(cls.start_pattern, token)
-        if not context or not match or context[-1].name not in ("Table", "TableHead", "TableBody", "Row"):
+        if not context or not match or context[-1].__class__.__name__ not in ("Table", "TableHead", "TableBody", "Row"):
             return (None, token)
 
-        match context[-1].name:
+        match context[-1].__class__.__name__:
             case "Table":
                 context[-1].add_table_body(context)
                 context[-2].add_row(context)
@@ -431,7 +431,7 @@ class Cell(ast.Cell):
         return (match, token[match.end("c") :])
 
     @classmethod
-    def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         context = kwargs["context"]
 
@@ -443,18 +443,90 @@ class Cell(ast.Cell):
 
 
 class CodeBlockHelper(ast_base.ASTCompositeBlock):
+    """A composite helper for parsing ``CodeBlocks``
+    This block will create a ``CodeBlock`` in its contents, parse its metadata and adjust contents.
+    When the block ends, it will replace itself with the ``CodeBlock`` in the context stack.
+    """
+
+    def __init__(self) -> None:
+        super().__init__("CodeBlockHelper (Dev)")
+
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        """Parse a ``CodeBlock`` metadata and add an empty ``CodeBlock`` to the block's contents"""
+
         match = kwargs["match"]
-        self.contents.metadata.append(match.group("lang"))
         self.contents.contents.append(ast.CodeBlock())
+        if isinstance(self.contents.contents[0], ast.CodeBlock):
+            self.contents.contents[0].metadata.append(match.group("lang"))
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        """Add ANY token to the ``CodeBlock``,
+        then check if the end of the block matches ``CodeBlock`` end pattern
+        """
+
         token = kwargs["token"]
         context = kwargs["context"]
-        match = re.search(cls.end_pattern, token)
+        code_block = context[-1].contents.contents[0]
+
+        code_block.contents += token
+        token = ""
+
+        search_string = code_block.contents[-4:]
+        match = re.search(cls.end_pattern, search_string)
         if not match:
-            context[0].contents.contents += token
-            token = ""
             return (match, token)
+        code_block.contents = code_block.contents[:-4]
+        context[-1] = code_block
+        return match, token
+
+
+class CodeHelper(ast_base.ASTCompositeBlock):
+    """A Helper for parsing inline code
+    This block will create a ``Code`` in its contents, parse its metadata and adjust contents.
+    When the block ends, it will replace itself with the ``Code`` in the context stack.
+    """
+
+    def __init__(self) -> None:
+        super().__init__("CodeHelper (Dev)")
+
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        """Set the end pattern of the block based on the start pattern.
+        Then add an empty ``Code`` block to the contents
+        """
+
+        match = kwargs["match"]
+        if match:
+            self.override_end(match.group()[:-1])
+            print(f"new end pattern: {match.group()[:-1]}")
+        code = ast.Code()
+        code.contents += match.group()[-1]
+        self.contents.contents.append(code)
+
+    @classmethod
+    def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+        match = re.search(cls.start_pattern, token)
+        token = '' if match else token
+        return match, token
+    
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        """Add ANY token to the ``Code``,
+        then check if the end of the block matches ``Code`` end pattern
+        """
+        token = kwargs["token"]
+        context = kwargs["context"]
+        code = context[-1].contents.contents[0]
+
+        code.contents += token
+        token = ""
+
+        end_len = len(cls.end_pattern)
+        search_string = code.contents[-end_len:]
+        match = re.search(cls.end_pattern, search_string)
+        if not match:
+            return (match, token)
+        code.contents = code.contents[:-end_len]
+        context[-1] = code
         return match, token
