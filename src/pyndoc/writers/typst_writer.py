@@ -1,5 +1,5 @@
 from pyndoc.ast.basic_blocks import ASTBlock
-from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList
+from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList, Plain
 
 
 class TypstWriter:
@@ -47,7 +47,11 @@ class TypstWriter:
         return f"{command} {self._process_contents(block.contents.contents)}"
 
     def _process_bullet_list(self, block: BulletList) -> str:
-        items = "\n".join(f"- {self._process_contents(item.contents.contents)}" for item in block.contents.contents)
+        items = "\n".join(
+            f"- {self._process_contents(item.contents.contents)}"
+            for item in block.contents.contents
+            if isinstance(item, (BulletList, Plain))
+        )
         return items
 
     def _process_str(self, block: Str) -> str:
