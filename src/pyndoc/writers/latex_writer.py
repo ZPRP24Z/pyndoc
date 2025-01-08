@@ -8,6 +8,7 @@ from pyndoc.ast.blocks import (
     Emph,
     Strong,
     Code,
+    CodeBlock,
     BulletList,
     Plain,
     OrderedList,
@@ -22,6 +23,7 @@ class LatexWriter:
             "Emph": self._process_emph,
             "Strong": self._process_strong,
             "Code": self._process_code,
+            "CodeBlock": self._process_code_block,
             "Header": self._process_header,
             "BulletList": self._process_bullet_list,
             "OrderedList": self._process_ordered_list,
@@ -52,6 +54,9 @@ class LatexWriter:
 
     def _process_code(self, block: Code) -> str:
         return f"\\texttt{{{self._process_contents(block.contents.contents)}}}"
+
+    def _process_code_block(self, block: CodeBlock) -> str:
+        return f"\\begin{{verbatim}}\n{block.contents}\n\\end{{verbatim}}"
 
     def _process_header(self, block: Header) -> str:
         level = block.contents.metadata[0] if block.contents.metadata else 1
