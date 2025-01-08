@@ -24,6 +24,7 @@ class ASTAtomBlock(ASTBlock, AtomReadHandler):
     def __init__(self, contents: str = "") -> None:
         """Constructor method"""
         self.contents = contents
+        self.metadata = []
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, ASTAtomBlock):

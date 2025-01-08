@@ -11,7 +11,7 @@ declared_tokens = {
     gfm.BulletList: (r"^(?P<s>[\t\s]*)[\*\+\-] ", not INLINE),
     gfm.OrderedList: (r"^(?P<s>[\t\s]*)(?P<num>\d{1,9})(?P<sep>[\.|)]) ", not INLINE),
     gfm.Emph: (r"\*[^*]{1}", INLINE),
-    ast.Code: (r"^`[^`]", INLINE),
+    gfm.CodeHelper: (r"^`{1,2}[^`]", INLINE),
     gfm.CodeBlockHelper: (r"^```(?P<lang>.*)\n", not INLINE),
     gfm.Table: (r"^\|", not INLINE),
     gfm.Cell: (r"^(?P<c> *\| *)[^\n]+", not INLINE),
@@ -22,19 +22,18 @@ declared_tokens = {
 # How do composite blocks end?
 declared_ends = {
     gfm.Header: r"\n",
-    gfm.CodeBlockHelper: r"```",
+    gfm.CodeBlockHelper: r"\n```",
     ast.Strong: r"\*\*",
     gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
     gfm.BulletList: r"\n\n",
     gfm.OrderedList: r"\n\n",
     ast_base.ASTCompositeBlock: r"\n",  # DEFAULT
-    ast.Code: r"`",
     gfm.Table: r"^[^\|]",
     gfm.Row: r"\|\n",
     gfm.Cell: r" *\|",
     gfm.TableHead: r"\n?",
-    gfm.TableBody: r"\n?",
+    gfm.TableBody: r"\n",
 }
 
 

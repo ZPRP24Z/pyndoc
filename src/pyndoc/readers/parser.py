@@ -67,7 +67,9 @@ class Parser:
         else:
             end_match, new_token = self._atom_wrapper_block.end(token=self.token, context=self.context)
         if not end_match:
+            self.token = new_token
             return
+        print(f"new token returned: {new_token}")
 
         # process token before the block-end
         self._process_atom_block(self.token[: end_match.start()])
@@ -107,8 +109,7 @@ class Parser:
         If the file has ended - go through each block in the context and end it
         """
         while self.context:
-            if self.token:
-                self.token = self.context[-1].handle_premature_closure(self.token)
+            self.token = self.context[-1].handle_premature_closure(token=self.token, context=self.context)
             self.process_trailing_atom()
             self._end()
 
