@@ -12,10 +12,6 @@ from pyndoc.ast.blocks import (
     Plain,
     OrderedList,
     Table,
-    TableHead,
-    TableBody,
-    Row,
-    Cell,
 )
 
 
