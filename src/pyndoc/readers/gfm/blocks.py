@@ -335,6 +335,9 @@ class Cell(ast.Cell):
         def _is_not_empty(span: tuple[int, int]) -> bool:
             return span[0] != span[1]
 
+        if not cls.is_delimiter_cell(cell) or not isinstance(cell.contents.contents[0], ast.Str):
+            raise ValueError("The cell provided as delimiter cell is not a delimiter cell")
+
         match = re.match(cls.delimiter_regex, cell.contents.contents[0].contents)
 
         alignment_map = {
