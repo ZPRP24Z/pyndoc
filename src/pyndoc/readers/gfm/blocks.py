@@ -284,7 +284,7 @@ class Row(ast.Row):
         :rtype: bool
         """
         for cell in row.contents.contents:
-            if not all([isinstance(cell, Cell), Cell.is_delimiter_cell(cell)]):
+            if not isinstance(cell, Cell) or not Cell.is_delimiter_cell(cell):
                 return False
         return True
 
