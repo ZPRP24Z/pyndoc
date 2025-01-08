@@ -340,6 +340,9 @@ class Cell(ast.Cell):
 
         match = re.match(cls.delimiter_regex, cell.contents.contents[0].contents)
 
+        if not match:
+            raise ValueError("The cell provided didnt match delimiter cell regex")
+
         alignment_map = {
             (True, True): ast_helpers.Alignment.ALIGN_CENTER,
             (True, False): ast_helpers.Alignment.ALIGN_LEFT,
