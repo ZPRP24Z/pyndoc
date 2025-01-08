@@ -21,12 +21,21 @@ def gfm_reader():
             "|now|multiline|table|\n|---|--|-|\n|hello|dssdsd|row3|\n\nAnd now lets check if it ends correctly",
             [TableHead, TableBody],
         ),
+        (
+            "|head1|head2|\n|-|-|\n|normal|row|\n|row missing cell|\n|normal|row|\n\nAnd lets see if it works",
+            [TableHead, TableBody],
+        ),
+        (
+            "| head |\n| :-- | :-----: |\n| there is a | missing head cell |\n\nAnd some text uder",
+            [TableHead, TableBody],
+        ),
     ],
 )
 @mock_file
 def test_table_contents(gfm_reader, content_types, mocker, data):
     gfm_reader.read("")
     table = gfm_reader._parser._tree[0]
+    print(table)
     assert isinstance(table, Table)
     assert len(table.contents.contents) == len(content_types)
     for content, type in zip(table.contents.contents, content_types):

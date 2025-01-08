@@ -34,7 +34,7 @@ declared_ends = {
     gfm.Row: r"\|\n",
     gfm.Cell: r" *\|",
     gfm.TableHead: r"\n?",
-    gfm.TableBody: r"\n?",
+    gfm.TableBody: r"\n",
 }
 
 

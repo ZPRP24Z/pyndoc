@@ -93,7 +93,7 @@ class TableBody(ASTCompositeBlock):
     """Table Body AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Table Body")
+        super().__init__("TableBody")
 
 
 class Row(ASTCompositeBlock):
@@ -112,7 +112,6 @@ class Cell(ASTCompositeBlock):
 
 class CodeBlock(ASTAtomBlock):
     """Code block AST block"""
-    
+
     def __init__(self) -> None:
         super().__init__("CodeBlock")
-
