@@ -107,8 +107,7 @@ class Parser:
         If the file has ended - go through each block in the context and end it
         """
         while self.context:
-            if self.token:
-                self.token = self.context[-1].handle_premature_closure(self.token)
+            self.token = self.context[-1].handle_premature_closure(token=self.token, context=self.context)
             self.process_trailing_atom()
             self._end()
 

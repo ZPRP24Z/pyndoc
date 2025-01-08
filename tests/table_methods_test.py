@@ -78,3 +78,25 @@ def test_cell_get_alignment(cell, alignment):
 )
 def test_check_delimiter_row(row, is_delimiter_row):
     assert Row.is_delimiter_row(row) == is_delimiter_row
+
+
+@pytest.mark.parametrize(
+    ("contents", "alignment", "row_size"),
+    [
+        (
+            [[Str("first"), Space(), Str("cell")], [Str("dsds")], [Str("third"), Space(), Str("cell")]],
+            [Alignment.ALIGN_CENTER, Alignment.ALIGN_CENTER, Alignment.ALIGN_CENTER],
+            3,
+        ),
+        (
+            [[Str("row"), Space(), Str("missing")], [Str("Cells")]],
+            [Alignment.ALIGN_LEFT, Alignment.ALIGN_DEFAULT, Alignment.ALIGN_RIGHT, Alignment.ALIGN_CENTER],
+            4,
+        ),
+    ],
+)
+def test_format_row(row, alignment, row_size):
+    Row.format_row(row, alignment, row_size)
+    assert len(row.contents.contents) == row_size
+    for cell, align in zip(row.contents.contents, alignment):
+        assert cell.contents.metadata[0] == align

@@ -3,7 +3,9 @@ import re
 from typing_extensions import Unpack
 from abc import ABC
 
+import pyndoc.ast.basic_blocks as ast_base
 import pyndoc.ast.blocks as ast
+from pyndoc.ast.read_handler import CompositeReadHandler
 import pyndoc.ast.helpers as ast_helpers
 
 
@@ -78,11 +80,12 @@ class Emph(ast.Emph):
         return (match, token)
 
     @classmethod
-    def handle_premature_closure(cls, token: str) -> str:
+    def handle_premature_closure(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> str:
+        token = kwargs["token"]
         return token[:-1] if token[-1] == "*" else token
 
 
-class _GFMList(ABC):
+class _GFMList(ABC, CompositeReadHandler):
     """
     Base class for gfm lists e.g. bullet list or ordered list
     Class made to avoid code repetition, it should not be used on its own
@@ -190,20 +193,33 @@ class Table(ast.Table):
         cell = Cell()
         context.append(cell)
 
-    def handle_table_head_end(self, context: list) -> bool:
-        # called when table head ends
+    @classmethod
+    def handle_table_end(cls, context: list) -> None:
+        table = context[-1]
+        thead = table.contents.contents[0]
+        alignment = table.contents.metadata[0]
+        row_size = len(alignment)
+
+        TableHead.format_table_head(thead, alignment, row_size)
+        if len(table.contents.contents) > 1:
+            tbody = table.contents.contents[1]
+            TableBody.format_table_body(tbody, alignment, row_size)
+
+        context[-1] = table
+
+    @classmethod
+    def handle_table_head_end(cls, context: list) -> None:
         table = context[-2]
         thead = context[-1]
-        delimiter_row = thead.contents.contents[1]
+        delimiter_row = thead.contents.contents.pop()
         row_contents = delimiter_row.contents.contents
 
         if not Row.is_delimiter_row(delimiter_row):
             raise NotImplementedError
 
-        column_count = len(row_contents)
         alignment = ast_helpers.AlignmentList([Cell.get_delimiter_cell_alignment(cell) for cell in row_contents])
 
-        table.contents.metadata = [column_count, alignment]
+        table.contents.metadata = [alignment]
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
         context = kwargs.get("context")
@@ -211,6 +227,13 @@ class Table(ast.Table):
         self.add_row(context)
         self.add_cell(context)
         return
+
+    @classmethod
+    def handle_premature_closure(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> str:
+        context = kwargs["context"]
+        token = kwargs["token"]
+        cls.handle_table_end(context)
+        return token
 
     @classmethod
     def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
@@ -229,7 +252,9 @@ class Table(ast.Table):
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs["token"]
         match = re.search(cls.end_pattern, token)
-        token = token[match.end() :] if match else token
+
+        if match:
+            cls.handle_table_end(kwargs["context"])
 
         return (match, token)
 
@@ -237,6 +262,15 @@ class Table(ast.Table):
 class TableHead(ast.TableHead):
     def __init__(self) -> None:
         super().__init__()
+
+    @staticmethod
+    def format_table_head(thead: TableHead, alignment: list[ast_helpers.Alignment], row_size: int) -> None:
+        if not len(thead.contents.contents):
+            raise ValueError("Invalid table head")
+        elif not isinstance(thead.contents.contents[0], Row):
+            raise ValueError("TableHead should contain only rows")
+
+        Row.format_row(thead.contents.contents[0], alignment, row_size)
 
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
@@ -258,6 +292,13 @@ class TableBody(ast.TableBody):
     def __init__(self) -> None:
         super().__init__()
 
+    @staticmethod
+    def format_table_body(tbody: TableBody, alignment: list[ast_helpers.Alignment], row_size: int) -> None:
+        for row in tbody.contents.contents:
+            if not isinstance(row, Row):
+                raise ValueError("TableBody should contain only rows in contents")
+            row = Row.format_row(row, alignment, row_size)
+
     @classmethod
     def end(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
         token = kwargs.get("token")
@@ -272,8 +313,19 @@ class Row(ast.Row):
     def __init__(self) -> None:
         super().__init__()
 
-    @classmethod
-    def is_delimiter_row(cls, row: Row) -> bool:
+    @staticmethod
+    def format_row(row: Row, alignment: list[ast_helpers.Alignment], size: int) -> None:
+        while len(row.contents.contents) < size:
+            row.contents.contents.append(Cell())
+        row.contents.contents = row.contents.contents[:size]
+
+        for cell, align in zip(row.contents.contents, alignment):
+            if not isinstance(cell, Cell):
+                raise ValueError("Row should contain only cells")
+            cell.contents.metadata.append(align)
+
+    @staticmethod
+    def is_delimiter_row(row: Row) -> bool:
         """Determines whether a row is delimiter row
 
         :param row: row being checked
@@ -282,7 +334,7 @@ class Row(ast.Row):
         :rtype: bool
         """
         for cell in row.contents.contents:
-            if not all([isinstance(cell, Cell), Cell.is_delimiter_cell(cell)]):
+            if not isinstance(cell, Cell) or not Cell.is_delimiter_cell(cell):
                 return False
         return True
 
@@ -333,7 +385,13 @@ class Cell(ast.Cell):
         def _is_not_empty(span: tuple[int, int]) -> bool:
             return span[0] != span[1]
 
+        if not cls.is_delimiter_cell(cell) or not isinstance(cell.contents.contents[0], ast.Str):
+            raise ValueError("The cell provided as delimiter cell is not a delimiter cell")
+
         match = re.match(cls.delimiter_regex, cell.contents.contents[0].contents)
+
+        if not match:
+            raise ValueError("The cell provided didnt match delimiter cell regex")
 
         alignment_map = {
             (True, True): ast_helpers.Alignment.ALIGN_CENTER,
@@ -382,3 +440,21 @@ class Cell(ast.Cell):
         cls._delete_trailing_spaces(context)
 
         return (match, token)
+
+
+class CodeBlockHelper(ast_base.ASTCompositeBlock):
+    def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
+        match = kwargs["match"]
+        self.contents.metadata.append(match.group("lang"))
+        self.contents.contents.append(ast.CodeBlock())
+
+    @classmethod
+    def end(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> tuple[re.Match | None, str]:
+        token = kwargs["token"]
+        context = kwargs["context"]
+        match = re.search(cls.end_pattern, token)
+        if not match:
+            context[0].contents.contents += token
+            token = ""
+            return (match, token)
+        return match, token

@@ -83,12 +83,11 @@ class CompositeReadHandler:
 
     @classmethod
     def is_inline(cls) -> bool:
-        """Check if a given block type is inline, default: False
-        """
+        """Check if a given block type is inline, default: False"""
         return cls.inline
 
     @classmethod
-    def handle_premature_closure(cls, token: str) -> str:
+    def handle_premature_closure(cls, **kwargs: Unpack[helpers.EndParams]) -> str:
         """Used when when the file has ended, but context has not been closed
         Potentially modify recieved token end return it
 
@@ -96,18 +95,21 @@ class CompositeReadHandler:
             The current token to be modified
         :type token: str
         """
+        print(f"handling in {cls.__name__}")
+        token = kwargs["token"]
         return token
 
 
 class AtomReadHandler:
     pattern = ""
+    start_pattern = ""
     has_content = False
 
     @classmethod
     def match_pattern(cls, **kwargs: Unpack[helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         r"""Check if the block matches a given token.
         Returns a regex match (or None if match failed)
-        
+
         :param \**kwargs:
             See below
 
@@ -134,7 +136,7 @@ class AtomReadHandler:
     @classmethod
     def block_has_content(cls) -> bool:
         """Check if a block can have contents
-        
+
         :return: True if the block can have contents
         :rtype: bool
         """
