@@ -448,7 +448,6 @@ class CodeBlockHelper(ast_base.ASTCompositeBlock):
 
     def process_read(self, **kwargs: Unpack[ast_helpers.ProcessParams]) -> None:
         match = kwargs["match"]
-        self.code_block = ast.CodeBlock()
         self.contents.contents.append(ast.CodeBlock())
         if isinstance(self.contents.contents[0], ast.CodeBlock):
             self.contents.contents[0].metadata.append(match.group("lang"))
