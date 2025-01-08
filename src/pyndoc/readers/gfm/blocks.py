@@ -17,7 +17,7 @@ class Space(ast.Space):
     def match_pattern(cls, **kwargs: Unpack[ast_helpers.AtomMatchParams]) -> tuple[re.Match | None, str]:
         context = kwargs["context"]
         text = kwargs["text"]
-        if not context or context[-1].name in ("BulletList", "OrderedList"):
+        if not context or context[-1].__class__.__name__ in ("BulletList", "OrderedList"):
             return (None, text)
 
         match = re.search(cls.pattern, text)
@@ -33,7 +33,7 @@ class SoftBreak(ast.SoftBreak):
         context = kwargs["context"]
         text = kwargs["text"]
 
-        if not context or context[-1].name in ("BulletList", "OrderedList"):
+        if not context or context[-1].__class__.__name__ in ("BulletList", "OrderedList"):
             return (None, text)
 
         match = re.search(cls.pattern, text)
@@ -71,7 +71,7 @@ class Emph(ast.Emph):
         token = kwargs["token"]
         context = kwargs["context"]
 
-        if context[-2] and context[-2].name == "Strong":
+        if context[-2] and context[-2].__class__.__name__ == "Strong":
             match = re.search(cls.end_pattern[:2], token)
             token = token[match.end() :] if match else token
         else:
@@ -240,7 +240,7 @@ class Table(ast.Table):
         token = kwargs["token"]
         context = kwargs["context"]
 
-        if context and context[-1].name in ("Table", "TableHead", "TableBody", "Row", "Cell"):
+        if context and context[-1].__class__.__name__ in ("Table", "TableHead", "TableBody", "Row", "Cell"):
             return (None, token)
 
         match = re.search(cls.start_pattern, token)
@@ -418,10 +418,10 @@ class Cell(ast.Cell):
         context = kwargs["context"]
 
         match = re.search(cls.start_pattern, token)
-        if not context or not match or context[-1].name not in ("Table", "TableHead", "TableBody", "Row"):
+        if not context or not match or context[-1].__class__.__name__ not in ("Table", "TableHead", "TableBody", "Row"):
             return (None, token)
 
-        match context[-1].name:
+        match context[-1].__class__.__name__:
             case "Table":
                 context[-1].add_table_body(context)
                 context[-2].add_row(context)

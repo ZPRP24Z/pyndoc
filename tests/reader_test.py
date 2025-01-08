@@ -237,7 +237,7 @@ def test_bulletlist(gfm_reader, mocker, data, plain_amt, plain_content_amt):
     assert len(bullet_list) == plain_amt
     plain_sum = 0
     for plain in bullet_list:
-        assert plain.name == "Plain"
+        assert plain.__class__.__name__ == "Plain"
         plain_sum += len(plain.contents.contents)
 
     assert plain_sum == plain_content_amt
@@ -270,7 +270,7 @@ def test_nested_bullet(gfm_reader, mocker, data, types):
     gfm_reader.read("Foo")
     bullet_list = gfm_reader._parser._tree[0].contents.contents
     for idx, item in enumerate(bullet_list):
-        assert item.name == types[idx]
+        assert item.__class__.__name__ == types[idx]
 
 
 @pytest.mark.parametrize(
@@ -287,7 +287,7 @@ def test_code_inline(gfm_reader, mocker, data, types):
     gfm_reader.read("Foo")
     code_blocks = gfm_reader._parser._tree[0].contents.contents
     for idx, item in enumerate(code_blocks):
-        assert item.name == types[idx]
+        assert item.__class__.__name__ == types[idx]
 
 
 @pytest.mark.parametrize(
