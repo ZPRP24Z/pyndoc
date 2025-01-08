@@ -1,5 +1,22 @@
 from pyndoc.ast.basic_blocks import ASTBlock
-from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList, Plain, OrderedList
+from pyndoc.ast.blocks import (
+    Space,
+    Str,
+    SoftBreak,
+    Header,
+    Para,
+    Emph,
+    Strong,
+    Code,
+    BulletList,
+    Plain,
+    OrderedList,
+    Table,
+    TableHead,
+    TableBody,
+    Row,
+    Cell,
+)
 
 
 class TypstWriter:
@@ -12,6 +29,7 @@ class TypstWriter:
             "Header": self._process_header,
             "BulletList": self._process_bullet_list,
             "OrderedList": self._process_ordered_list,
+            "Table": self._process_table,
             "Str": self._process_str,
             "Space": self._process_space,
             "SoftBreak": self._process_soft_break,
@@ -62,6 +80,24 @@ class TypstWriter:
             if isinstance(item, Plain)
         )
         return items
+
+    def _process_table(self, block: Table) -> str:
+        num_columns = len(block.contents.contents[0].contents.contents[0].contents.contents)
+
+        headers = []
+        for row in block.contents.contents[0].contents.contents:
+            headers.append(
+                ", ".join(f"[*{self._process_contents(cell.contents.contents)}*]" for cell in row.contents.contents)
+            )
+
+        body_rows = []
+        for row in block.contents.contents[1].contents.contents:
+            body_rows.append(
+                ", ".join(f"[{self._process_contents(cell.contents.contents)}]" for cell in row.contents.contents)
+            )
+
+        table_representation = f"#table(\n  columns: {num_columns},\n  " + ",\n  ".join(headers + body_rows) + "\n)"
+        return table_representation
 
     def _process_str(self, block: Str) -> str:
         return block.contents
