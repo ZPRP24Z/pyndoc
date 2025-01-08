@@ -31,6 +31,7 @@ class ASTAtomBlock(ASTBlock, AtomReadHandler):
         """Constructor method
         """
         self.contents = contents
+        self.metadata = []
         super().__init__(name)
 
     def __eq__(self, other: object) -> bool:
