@@ -80,7 +80,8 @@ class Emph(ast.Emph):
         return (match, token)
 
     @classmethod
-    def handle_premature_closure(cls, token: str) -> str:
+    def handle_premature_closure(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> str:
+        token = kwargs["token"]
         return token[:-1] if token[-1] == "*" else token
 
 
@@ -206,8 +207,8 @@ class Table(ast.Table):
 
         context[-1] = table
 
-    def handle_table_head_end(self, context: list) -> None:
-        # called when table head ends
+    @classmethod
+    def handle_table_head_end(cls, context: list) -> None:
         table = context[-2]
         thead = context[-1]
         delimiter_row = thead.contents.contents.pop()
@@ -226,6 +227,13 @@ class Table(ast.Table):
         self.add_row(context)
         self.add_cell(context)
         return
+
+    @classmethod
+    def handle_premature_closure(cls, **kwargs: Unpack[ast_helpers.EndParams]) -> str:
+        context = kwargs["context"]
+        token = kwargs["token"]
+        cls.handle_table_end(context)
+        return token
 
     @classmethod
     def start(cls, **kwargs: Unpack[ast_helpers.StartParams]) -> tuple[re.Match | None, str]:
