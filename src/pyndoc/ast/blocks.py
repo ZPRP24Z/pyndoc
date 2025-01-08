@@ -5,14 +5,14 @@ class Space(ASTAtomBlock):
     """AST Atom block representing whitespace"""
 
     def __init__(self) -> None:
-        super().__init__("Space")
+        super().__init__()
 
 
 class Str(ASTAtomBlock):
     """special AST block representing string without whitespace characters"""
 
     def __init__(self, contents: str = "") -> None:
-        super().__init__("Str", contents)
+        super().__init__(contents)
 
     def __str__(self) -> str:
         return super().__str__() + f' "{self.contents}"'
@@ -20,99 +20,98 @@ class Str(ASTAtomBlock):
 
 class SoftBreak(ASTAtomBlock):
     def __init__(self) -> None:
-        super().__init__("SoftBreak")
+        super().__init__()
 
 
 class Header(ASTCompositeBlock):
     """AST block representing a heading"""
 
     def __init__(self) -> None:
-        super().__init__("Header")
+        super().__init__()
 
 
 class Para(ASTCompositeBlock):
     """AST block representing a paragraph."""
 
     def __init__(self) -> None:
-        super().__init__("Para")
+        super().__init__()
 
 
 class Emph(ASTCompositeBlock):
     """Basic Italic AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Emph")
+        super().__init__()
 
 
 class Strong(ASTCompositeBlock):
     """Basic Bold AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Strong")
+        super().__init__()
 
 
 class Code(ASTCompositeBlock):
     """Basic Code AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Code")
+        super().__init__()
 
 
 class BulletList(ASTCompositeBlock):
     def __init__(self) -> None:
-        super().__init__("BulletList")
+        super().__init__()
 
 
 class OrderedList(ASTCompositeBlock):
     """Ordered List AST block"""
 
     def __init__(self) -> None:
-        super().__init__("OrderedList")
+        super().__init__()
 
 
 class Plain(ASTCompositeBlock):
     def __init__(self) -> None:
-        super().__init__("Plain")
+        super().__init__()
 
 
 class Table(ASTCompositeBlock):
     """Table AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Table")
+        super().__init__()
 
 
 class TableHead(ASTCompositeBlock):
     """Table Head AST block"""
 
     def __init__(self) -> None:
-        super().__init__("TableHead")
+        super().__init__()
 
 
 class TableBody(ASTCompositeBlock):
     """Table Body AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Table Body")
+        super().__init__()
 
 
 class Row(ASTCompositeBlock):
     """Table Row AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Row")
+        super().__init__()
 
 
 class Cell(ASTCompositeBlock):
     """Table Cell AST block"""
 
     def __init__(self) -> None:
-        super().__init__("Cell")
+        super().__init__()
 
 
 class CodeBlock(ASTAtomBlock):
     """Code block AST block"""
-    
-    def __init__(self) -> None:
-        super().__init__("CodeBlock")
 
+    def __init__(self) -> None:
+        super().__init__()

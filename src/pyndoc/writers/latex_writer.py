@@ -23,7 +23,7 @@ class LatexWriter:
         return result
 
     def _process_block(self, block: ASTBlock) -> str:
-        handler = self.block_handlers.get(block.name, self._process_unknown)
+        handler = self.block_handlers.get(block.__class__.__name__, self._process_unknown)
         return handler(block)
 
     def _process_para(self, block: Para) -> str:
@@ -62,7 +62,7 @@ class LatexWriter:
         return "\n"
 
     def _process_unknown(self, block: ASTBlock) -> str:
-        return f"% Unknown block: {block.name}"
+        return f"% Unknown block: {block.__class__.__name__}"
 
     def _process_contents(self, contents: list[ASTBlock]) -> str:
         return "".join(self._process_block(item) for item in contents)
