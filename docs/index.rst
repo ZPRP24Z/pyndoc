@@ -15,6 +15,5 @@ This documentation contains usage and development instructions
    :caption: Contents:
 
    modules
-   ast
    new-readers
    development-instructions
