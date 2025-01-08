@@ -1,5 +1,5 @@
 from pyndoc.ast.basic_blocks import ASTBlock
-from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList, Plain
+from pyndoc.ast.blocks import Space, Str, SoftBreak, Header, Para, Emph, Strong, Code, BulletList, Plain, OrderedList
 
 
 class TypstWriter:
@@ -11,6 +11,7 @@ class TypstWriter:
             "Code": self._process_code,
             "Header": self._process_header,
             "BulletList": self._process_bullet_list,
+            "OrderedList": self._process_ordered_list,
             "Str": self._process_str,
             "Space": self._process_space,
             "SoftBreak": self._process_soft_break,
@@ -51,6 +52,14 @@ class TypstWriter:
             f"- {self._process_contents(item.contents.contents)}"
             for item in block.contents.contents
             if isinstance(item, (BulletList, Plain))
+        )
+        return items
+
+    def _process_ordered_list(self, block: OrderedList) -> str:
+        items = "\n".join(
+            f"+ {self._process_contents(item.contents.contents)}"
+            for item in block.contents.contents
+            if isinstance(item, Plain)
         )
         return items
 
