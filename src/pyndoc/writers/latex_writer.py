@@ -53,7 +53,7 @@ class LatexWriter:
         return f"\\textbf{{{self._process_contents(block.contents.contents)}}}"
 
     def _process_code(self, block: Code) -> str:
-        return f"\\texttt{{{self._process_contents(block.contents.contents)}}}"
+        return f"\\texttt{{{block.contents}}}"
 
     def _process_code_block(self, block: CodeBlock) -> str:
         return f"\\begin{{verbatim}}\n{block.contents}\n\\end{{verbatim}}"
@@ -113,8 +113,8 @@ class LatexWriter:
     def _process_unknown(self, block: ASTBlock) -> str:
         return f"% Unknown block: {block.__class__.__name__}"
 
-    def _process_contents(self, contents: list[ASTBlock]) -> str:
-        return "".join(self._process_block(item) for item in contents)
+    def _process_contents(self, contents: list) -> str:
+        return "".join(self._process_block(item) if isinstance(item, ASTBlock) else str(item) for item in contents)
 
     def print_tree(self, ast_tree: list[ASTBlock]) -> None:
         print(self._get_latex_representation(ast_tree))
