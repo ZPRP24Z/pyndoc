@@ -1,21 +1,29 @@
-Writers (pyndoc.writers package)
-================================
+writers package
+===============
 
 Submodules
 ----------
 
-pyndoc.writers.latex\_writer module
------------------------------------
+writers.latex\_writer module
+----------------------------
 
-.. automodule:: pyndoc.writers.latex_writer
+.. automodule:: writers.latex_writer
    :members:
    :undoc-members:
    :show-inheritance:
 
-pyndoc.writers.native\_writer module
-------------------------------------
+writers.native\_writer module
+-----------------------------
 
-.. automodule:: pyndoc.writers.native_writer
+.. automodule:: writers.native_writer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+writers.typst\_writer module
+----------------------------
+
+.. automodule:: writers.typst_writer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +31,7 @@ pyndoc.writers.native\_writer module
 Module contents
 ---------------
 
-.. automodule:: pyndoc.writers
+.. automodule:: writers
    :members:
    :undoc-members:
    :show-inheritance:
