@@ -83,18 +83,23 @@ class LatexWriter:
     def _process_table(self, block: Table) -> str:
         num_columns = len(block.contents.contents[0].contents.contents[0].contents.contents)
         table_alignment = f"|{'|'.join(['c'] * num_columns)}|"
+
         rows = []
 
-        for row in block.contents.contents[0].contents.contents:
-            row_content = " & ".join(self._process_contents(cell.contents.contents) for cell in row.contents.contents)
-            rows.append(f"{row_content} \\\\")
-            rows.append("\\hline")
+        header_row = block.contents.contents[0].contents.contents[0]
+        header_content = " & ".join(
+            self._process_contents(cell.contents.contents) for cell in header_row.contents.contents
+        )
+        rows.append("\\hline")
+        rows.append(f"{header_content} \\\\")
+        rows.append("\\hline")
 
         for row in block.contents.contents[1].contents.contents:
             row_content = " & ".join(self._process_contents(cell.contents.contents) for cell in row.contents.contents)
             rows.append(f"{row_content} \\\\")
+            rows.append("\\hline")
 
-        return f"\\begin{{tabular}}{{{table_alignment}}}\n\\hline\n{chr(10).join(rows)}\n\\hline\n\\end{{tabular}}"
+        return f"\\begin{{tabular}}{{{table_alignment}}}\n{chr(10).join(rows)}\n\\end{{tabular}}"
 
     def _process_str(self, block: Str) -> str:
         return block.contents
