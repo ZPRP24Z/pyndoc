@@ -7,7 +7,7 @@ Submodules
 writers.latex\_writer module
 ----------------------------
 
-.. automodule:: writers.latex_writer
+.. automodule:: pyndoc.writers.latex_writer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ writers.latex\_writer module
 writers.native\_writer module
 -----------------------------
 
-.. automodule:: writers.native_writer
+.. automodule:: pyndoc.writers.native_writer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ writers.native\_writer module
 writers.typst\_writer module
 ----------------------------
 
-.. automodule:: writers.typst_writer
+.. automodule:: pyndoc.writers.typst_writer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ writers.typst\_writer module
 Module contents
 ---------------
 
-.. automodule:: writers
+.. automodule:: pyndoc.writers
    :members:
    :undoc-members:
    :show-inheritance:
