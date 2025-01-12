@@ -127,9 +127,10 @@ class LatexWriter:
         :return: The LaTeX representation of the bullet list.
         """
         items = "\n".join(
-            f"\\item {self._process_contents(item.contents.contents)}"
+            (f"\\item {self._process_contents(item.contents.contents)}" 
+               if isinstance(item, Plain) else self._process_block(item))
             for item in block.contents.contents
-            if isinstance(item, (BulletList, Plain))
+            if isinstance(item, (BulletList, OrderedList, Plain))
         )
         return f"\\begin{{itemize}}\n{items}\n\\end{{itemize}}"
 
@@ -141,9 +142,10 @@ class LatexWriter:
         :return: The LaTeX representation of the ordered list.
         """
         items = "\n".join(
-            f"\\item {self._process_contents(item.contents.contents)}"
+            (f"\\item {self._process_contents(item.contents.contents)}"
+              if isinstance(item, Plain) else self._process_block(item))
             for item in block.contents.contents
-            if isinstance(item, Plain)
+            if isinstance(item, (Plain, OrderedList, BulletList))
         )
         return f"\\begin{{enumerate}}\n{items}\n\\end{{enumerate}}"
 

@@ -498,7 +498,6 @@ class CodeHelper(ast_base.ASTCompositeBlock):
         match = kwargs["match"]
         if match:
             self.override_end(match.group()[:-1])
-            print(f"new end pattern: {match.group()[:-1]}")
         code = ast.Code()
         code.contents += match.group()[-1]
         self.contents.contents.append(code)

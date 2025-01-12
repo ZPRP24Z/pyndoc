@@ -25,7 +25,7 @@ declared_ends = {
     ast.Strong: r"\*\*",
     gfm.Emph: r"\*[^*]{1}",
     ast.Para: r"\n\n",
-    gfm.BulletList: r"\n\n",
+    gfm.BulletList: r"\n",
     gfm.OrderedList: r"\n\n",
     ast_base.ASTCompositeBlock: r"\n",  # DEFAULT
     gfm.Table: r"^[^\|]",

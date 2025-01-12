@@ -95,7 +95,6 @@ class CompositeReadHandler:
             The current token to be modified
         :type token: str
         """
-        print(f"handling in {cls.__name__}")
         token = kwargs["token"]
         return token
 

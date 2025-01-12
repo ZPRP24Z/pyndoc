@@ -69,7 +69,6 @@ class Parser:
         if not end_match:
             self.token = new_token
             return
-        print(f"new token returned: {new_token}")
 
         # process token before the block-end
         self._process_atom_block(self.token[: end_match.start()])

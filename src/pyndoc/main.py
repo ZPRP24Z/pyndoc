@@ -36,9 +36,10 @@ def main() -> None:
         ast_tree = r._parser._tree
         writer = writers_dict[to_format]
 
-        writer.print_tree(ast_tree)
         if output_file:
             writer.write_tree_to_file(output_file, ast_tree)
+            return
+        writer.print_tree(ast_tree)
 
     except KeyError:
         print(f"Incorrect target format specified: {to_format}")

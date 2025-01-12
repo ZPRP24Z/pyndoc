@@ -80,7 +80,7 @@ class TypstWriter:
         :param block: The emphasized text block.
         :return: The Typst representation of the emphasized text.
         """
-        return f"*_{self._process_contents(block.contents.contents)}_*"
+        return f"_{self._process_contents(block.contents.contents)}_"
 
     def _process_strong(self, block: Strong) -> str:
         """
@@ -99,7 +99,7 @@ class TypstWriter:
         :param block: The inline code block.
         :return: The Typst representation of the inline code.
         """
-        return f"`{self._process_contents(block.contents.contents)}`"
+        return f"`{block.contents}`"
 
     def _process_code_block(self, block: CodeBlock) -> str:
         """
@@ -129,9 +129,10 @@ class TypstWriter:
         :return: The Typst representation of the bullet list.
         """
         items = "\n".join(
-            f"- {self._process_contents(item.contents.contents)}"
+            (f"{block.contents.metadata[0] * ' '}- {self._process_contents(item.contents.contents)}"
+              if isinstance(item, Plain) else self._process_block(item))
             for item in block.contents.contents
-            if isinstance(item, (BulletList, Plain))
+            if isinstance(item, (BulletList, Plain, OrderedList))
         )
         return items
 
@@ -143,9 +144,10 @@ class TypstWriter:
         :return: The Typst representation of the ordered list.
         """
         items = "\n".join(
-            f"+ {self._process_contents(item.contents.contents)}"
+            (f"+ {self._process_contents(item.contents.contents)}"
+              if isinstance(item, Plain) else self._process_block(item))
             for item in block.contents.contents
-            if isinstance(item, Plain)
+            if isinstance(item, (Plain, BulletList, OrderedList))
         )
         return items
 
@@ -161,7 +163,7 @@ class TypstWriter:
         headers = []
         for row in block.contents.contents[0].contents.contents:
             headers.append(
-                ", ".join(f"[*{self._process_contents(cell.contents.contents)}*]" for cell in row.contents.contents)
+                ", ".join(f"[{self._process_contents(cell.contents.contents)}]" for cell in row.contents.contents)
             )
 
         body_rows = []
@@ -209,7 +211,7 @@ class TypstWriter:
         """
         return f"// Unknown block: {block.__class__.__name__}"
 
-    def _process_contents(self, contents: list[ASTBlock]) -> str:
+    def _process_contents(self, contents: list) -> str:
         """
         Processes a list of content blocks.
 
