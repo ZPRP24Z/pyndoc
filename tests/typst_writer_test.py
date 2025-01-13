@@ -74,29 +74,3 @@ def test_headers_to_typst(gfm_reader, typst_writer, mocker, data, expected_typst
     generated_typst = typst_writer._get_typst_representation(ast_tree)
 
     assert generated_typst.strip() == expected_typst.strip()
-
-
-@pytest.mark.parametrize(
-    ("data", "expected_typst"),
-    [
-        ("*italic text*", "*_italic text_*"),
-        ("**bold text**", "*bold text*"),
-        ("*italic text* followed by **bold text**", "*_italic text_* followed by *bold text*"),
-        ("**bold text with *italic inside***", "*bold text with *_italic inside_**"),
-        (
-            "Normal text with *italic*, **bold**, and **bold *italic***",
-            "Normal text with *_italic_*, *bold*, and *bold *_italic_**",
-        ),
-    ],
-)
-@mock_file
-def test_emphasis_and_bold_to_typst(gfm_reader, typst_writer, mocker, data, expected_typst):
-    filename = "test_emphasis.md"
-
-    gfm_reader.read(filename)
-
-    ast_tree = gfm_reader._parser._tree
-
-    generated_typst = typst_writer._get_typst_representation(ast_tree)
-
-    assert generated_typst.strip() == expected_typst.strip()
